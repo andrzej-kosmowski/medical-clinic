@@ -42,7 +42,7 @@ public class PatientService {
         existing.setFirstName(updatedPatient.getFirstName());
         existing.setLastName(updatedPatient.getLastName());
         existing.setPhoneNumber(updatedPatient.getPhoneNumber());
-        existing.setBirthDate(updatedPatient.getBirthDate());
+        existing.setBirthday(updatedPatient.getBirthday());
 
         return patientRepository.save(existing);
     }
