@@ -1,5 +1,6 @@
 package com.andrzej_kosmowski.medical_clinic.repository;
 
+import com.andrzej_kosmowski.medical_clinic.exception.PatientAlreadyExistsException;
 import com.andrzej_kosmowski.medical_clinic.model.Patient;
 import org.springframework.stereotype.Repository;
 
@@ -21,12 +22,13 @@ public class PatientRepository {
                 .findFirst();
     }
 
-    public boolean existsByEmail(String email) {
-        return patients.stream()
-                .anyMatch(patient -> patient.getEmail().equals(email));
-    }
-
     public Patient save(Patient patient) {
+        if (patients.stream()
+                .filter(existing -> existing != patient)
+                .anyMatch(existing -> existing.hasSameEmail(patient))) {
+            throw new PatientAlreadyExistsException(patient.getEmail());
+        }
+
         if (!patients.contains(patient)) {
             patients.add(patient);
         }

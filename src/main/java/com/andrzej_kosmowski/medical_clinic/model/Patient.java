@@ -44,7 +44,6 @@ public class Patient {
         if (birthday != null && birthday.isAfter(LocalDate.now())) {
             throw new InvalidPatientDataException("Birth date must be after the current date");
         }
-
     }
 
     public void update(Patient updatedPatient) {
@@ -56,5 +55,10 @@ public class Patient {
         this.birthday = updatedPatient.getBirthday();
         this.idCardNo = updatedPatient.getIdCardNo();
     }
-}
 
+    public boolean hasSameEmail(Patient patient) {
+        return patient != null
+                && this.email != null
+                && this.email.equalsIgnoreCase(patient.getEmail());
+    }
+}

@@ -1,6 +1,5 @@
 package com.andrzej_kosmowski.medical_clinic.service;
 
-import com.andrzej_kosmowski.medical_clinic.exception.PatientAlreadyExistsException;
 import com.andrzej_kosmowski.medical_clinic.exception.PatientNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.model.Patient;
 import com.andrzej_kosmowski.medical_clinic.repository.PatientRepository;
@@ -25,9 +24,6 @@ public class PatientService {
 
     public Patient addPatient(Patient patient) {
         patient.validate();
-        if (patientRepository.existsByEmail(patient.getEmail())) {
-            throw new PatientAlreadyExistsException(patient.getEmail());
-        }
         return patientRepository.save(patient);
     }
 
