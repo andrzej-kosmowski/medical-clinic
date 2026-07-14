@@ -17,4 +17,14 @@ public class Patient {
     private String lastName;
     private String phoneNumber;
     private LocalDate birthday;
+
+    public void update(Patient updatedPatient) {
+        this.email = updatedPatient.getEmail();
+        this.firstName = updatedPatient.getFirstName();
+        this.lastName = updatedPatient.getLastName();
+        this.phoneNumber = updatedPatient.getPhoneNumber();
+        this.birthday = updatedPatient.getBirthday();
+        this.idCardNo = updatedPatient.getIdCardNo();
+    }
 }
+

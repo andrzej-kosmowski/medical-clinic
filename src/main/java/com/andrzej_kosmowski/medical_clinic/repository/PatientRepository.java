@@ -9,10 +9,10 @@ import java.util.Optional;
 
 @Repository
 public class PatientRepository {
-    private final List< Patient> patients = new ArrayList<>();
+    private final List<Patient> patients = new ArrayList<>();
 
     public List<Patient> findAll() {
-        return patients;
+        return new ArrayList<>(patients);
     }
 
     public Optional<Patient> findByEmail(String email) {
@@ -30,7 +30,6 @@ public class PatientRepository {
         if (!patients.contains(patient)) {
             patients.add(patient);
         }
-
         return patient;
     }
 

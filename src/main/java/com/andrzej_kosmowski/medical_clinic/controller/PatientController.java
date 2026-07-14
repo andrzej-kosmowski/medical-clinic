@@ -36,9 +36,15 @@ public class PatientController {
         patientService.deletePatientByEmail(email);
     }
 
-    @PatchMapping("/{email}")
+    @PutMapping("/{email}")
     @ResponseStatus(HttpStatus.OK)
     public Patient updatePatientByEmail(@PathVariable String email, @RequestBody Patient patient) {
         return patientService.updatePatientByEmail(email, patient);
+    }
+
+    @PatchMapping("/{email}/password")
+    @ResponseStatus(HttpStatus.OK)
+    public Patient changePatientPassword(@PathVariable String email, @RequestBody String newPassword) {
+        return patientService.changePassword(email, newPassword);
     }
 }

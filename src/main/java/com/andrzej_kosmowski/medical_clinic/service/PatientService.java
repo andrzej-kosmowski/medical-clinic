@@ -32,18 +32,20 @@ public class PatientService {
 
     public void deletePatientByEmail(String email) {
         Patient patient = getPatientByEmail(email);
-
         patientRepository.delete(patient);
     }
 
     public Patient updatePatientByEmail(String email, Patient updatedPatient) {
-        Patient existing = getPatientByEmail(email);
-
-        existing.setFirstName(updatedPatient.getFirstName());
-        existing.setLastName(updatedPatient.getLastName());
-        existing.setPhoneNumber(updatedPatient.getPhoneNumber());
-        existing.setBirthday(updatedPatient.getBirthday());
-
+        Patient existing = patientRepository.findByEmail(email)
+                .orElseThrow(() -> new PatientNotFoundException(email));
+        existing.update(updatedPatient);
         return patientRepository.save(existing);
+    }
+
+    public Patient changePassword(String email, String newPassword) {
+        Patient patient = patientRepository.findByEmail(email)
+                        .orElseThrow(() -> new PatientNotFoundException(email));
+        patient.setPassword(newPassword);
+        return patientRepository.save(patient);
     }
 }
