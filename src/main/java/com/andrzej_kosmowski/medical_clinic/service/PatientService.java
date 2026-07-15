@@ -51,7 +51,7 @@ public class PatientService {
 
     public void changePassword(String email, ChangePasswordCommand command) {
         Patient patient = findPatientOrThrow(email);
-        patient.setPassword(command.newPassword());
+        patient.changePassword(command.newPassword());
         patientRepository.save(patient);
     }
 

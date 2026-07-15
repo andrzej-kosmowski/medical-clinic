@@ -48,18 +48,25 @@ public class Patient {
     }
 
     public void update(UpdatePatientCommand command) {
-        this.validate();
         this.email = command.email();
         this.firstName = command.firstName();
         this.lastName = command.lastName();
         this.phoneNumber = command.phoneNumber();
         this.birthday = command.birthday();
         this.idCardNo = command.idCardNo();
+        this.validate();
     }
 
     public boolean hasSameEmail(Patient patient) {
         return patient != null
                 && this.email != null
                 && this.email.equalsIgnoreCase(patient.getEmail());
+    }
+
+    public void changePassword(String newPassword) {
+        if (newPassword == null || newPassword.length() < 6) {
+            throw new InvalidPatientDataException("Password must have at least 6 characters");
+        }
+        this.password = newPassword;
     }
 }

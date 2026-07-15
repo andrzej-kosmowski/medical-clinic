@@ -18,7 +18,7 @@ public class PatientRepository {
 
     public Optional<Patient> findByEmail(String email) {
         return patients.stream()
-                .filter(patient -> patient.getEmail().equals(email))
+                .filter(patient -> patient.getEmail().equalsIgnoreCase(email))
                 .findFirst();
     }
 
