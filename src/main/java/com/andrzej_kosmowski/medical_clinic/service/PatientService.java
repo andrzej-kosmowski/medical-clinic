@@ -1,5 +1,10 @@
 package com.andrzej_kosmowski.medical_clinic.service;
 
+import com.andrzej_kosmowski.medical_clinic.mapper.PatientMapper;
+import com.andrzej_kosmowski.medical_clinic.dto.ChangePasswordCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.CreatePatientCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.PatientDto;
+import com.andrzej_kosmowski.medical_clinic.dto.UpdatePatientCommand;
 import com.andrzej_kosmowski.medical_clinic.exception.PatientNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.model.Patient;
 import com.andrzej_kosmowski.medical_clinic.repository.PatientRepository;
@@ -12,37 +17,46 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PatientService {
     private final PatientRepository patientRepository;
+    private final PatientMapper patientMapper;
 
-    public List<Patient> getAllPatients() {
-        return patientRepository.findAll();
+    public List<PatientDto> getAllPatients() {
+        return patientRepository.findAll().stream()
+                .map(patientMapper::toDto)
+                .toList();
     }
 
-    public Patient getPatientByEmail(String email) {
-        return patientRepository.findByEmail(email)
-                .orElseThrow(() -> new PatientNotFoundException(email));
+    public PatientDto getPatientByEmail(String email) {
+        Patient patient = findPatientOrThrow(email);
+        return patientMapper.toDto(patient);
     }
 
-    public Patient addPatient(Patient patient) {
+    public PatientDto addPatient(CreatePatientCommand command) {
+        Patient patient = patientMapper.from(command);
         patient.validate();
-        return patientRepository.save(patient);
+        Patient saved = patientRepository.save(patient);
+        return patientMapper.toDto(saved);
     }
 
     public void deletePatientByEmail(String email) {
-        Patient patient = getPatientByEmail(email);
+        Patient patient = findPatientOrThrow(email);
         patientRepository.delete(patient);
     }
 
-    public Patient updatePatientByEmail(String email, Patient updatedPatient) {
-        Patient existing = patientRepository.findByEmail(email)
-                .orElseThrow(() -> new PatientNotFoundException(email));
-        existing.update(updatedPatient);
-        return patientRepository.save(existing);
+    public PatientDto updatePatientByEmail(String email, UpdatePatientCommand command) {
+        Patient existing = findPatientOrThrow(email);
+        existing.update(command);
+        Patient updated = patientRepository.save(existing);
+        return patientMapper.toDto(updated);
     }
 
-    public Patient changePassword(String email, String newPassword) {
-        Patient patient = patientRepository.findByEmail(email)
+    public void changePassword(String email, ChangePasswordCommand command) {
+        Patient patient = findPatientOrThrow(email);
+        patient.setPassword(command.newPassword());
+        patientRepository.save(patient);
+    }
+
+    private Patient findPatientOrThrow(String email) {
+        return patientRepository.findByEmail(email)
                 .orElseThrow(() -> new PatientNotFoundException(email));
-        patient.setPassword(newPassword);
-        return patientRepository.save(patient);
     }
 }

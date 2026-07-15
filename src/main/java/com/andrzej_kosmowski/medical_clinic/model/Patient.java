@@ -1,5 +1,6 @@
 package com.andrzej_kosmowski.medical_clinic.model;
 
+import com.andrzej_kosmowski.medical_clinic.dto.UpdatePatientCommand;
 import com.andrzej_kosmowski.medical_clinic.exception.InvalidPatientDataException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,14 +47,14 @@ public class Patient {
         }
     }
 
-    public void update(Patient updatedPatient) {
-        updatedPatient.validate();
-        this.email = updatedPatient.getEmail();
-        this.firstName = updatedPatient.getFirstName();
-        this.lastName = updatedPatient.getLastName();
-        this.phoneNumber = updatedPatient.getPhoneNumber();
-        this.birthday = updatedPatient.getBirthday();
-        this.idCardNo = updatedPatient.getIdCardNo();
+    public void update(UpdatePatientCommand command) {
+        this.validate();
+        this.email = command.email();
+        this.firstName = command.firstName();
+        this.lastName = command.lastName();
+        this.phoneNumber = command.phoneNumber();
+        this.birthday = command.birthday();
+        this.idCardNo = command.idCardNo();
     }
 
     public boolean hasSameEmail(Patient patient) {

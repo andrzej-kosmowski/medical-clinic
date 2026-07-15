@@ -1,6 +1,9 @@
 package com.andrzej_kosmowski.medical_clinic.controller;
 
-import com.andrzej_kosmowski.medical_clinic.model.Patient;
+import com.andrzej_kosmowski.medical_clinic.dto.ChangePasswordCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.CreatePatientCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.PatientDto;
+import com.andrzej_kosmowski.medical_clinic.dto.UpdatePatientCommand;
 import com.andrzej_kosmowski.medical_clinic.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,18 +18,18 @@ public class PatientController {
     private final PatientService patientService;
 
     @GetMapping
-    public List<Patient> getAll() {
+    public List<PatientDto> getAll() {
         return patientService.getAllPatients();
     }
 
     @GetMapping("/{email}")
-    public Patient getPatient(@PathVariable String email) {
+    public PatientDto getPatient(@PathVariable String email) {
         return patientService.getPatientByEmail(email);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Patient addPatient(@RequestBody Patient patient) {
+    public PatientDto addPatient(@RequestBody CreatePatientCommand patient) {
         return patientService.addPatient(patient);
     }
 
@@ -38,13 +41,13 @@ public class PatientController {
 
     @PutMapping("/{email}")
     @ResponseStatus(HttpStatus.OK)
-    public Patient updatePatientByEmail(@PathVariable String email, @RequestBody Patient patient) {
+    public PatientDto updatePatientByEmail(@PathVariable String email, @RequestBody UpdatePatientCommand patient) {
         return patientService.updatePatientByEmail(email, patient);
     }
 
     @PatchMapping("/{email}/password")
     @ResponseStatus(HttpStatus.OK)
-    public Patient changePatientPassword(@PathVariable String email, @RequestBody String newPassword) {
-        return patientService.changePassword(email, newPassword);
+    public void changePatientPassword(@PathVariable String email, @RequestBody ChangePasswordCommand newPassword) {
+        patientService.changePassword(email, newPassword);
     }
 }
