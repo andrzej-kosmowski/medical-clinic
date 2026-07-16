@@ -1,11 +1,11 @@
 package com.andrzej_kosmowski.medical_clinic.service;
 
-import com.andrzej_kosmowski.medical_clinic.mapper.PatientMapper;
 import com.andrzej_kosmowski.medical_clinic.dto.ChangePasswordCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.CreatePatientCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.PatientDto;
 import com.andrzej_kosmowski.medical_clinic.dto.UpdatePatientCommand;
 import com.andrzej_kosmowski.medical_clinic.exception.PatientNotFoundException;
+import com.andrzej_kosmowski.medical_clinic.mapper.PatientMapper;
 import com.andrzej_kosmowski.medical_clinic.model.Patient;
 import com.andrzej_kosmowski.medical_clinic.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
