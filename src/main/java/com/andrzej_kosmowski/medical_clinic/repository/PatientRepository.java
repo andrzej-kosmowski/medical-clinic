@@ -22,15 +22,22 @@ public class PatientRepository {
                 .findFirst();
     }
 
-    public Patient save(Patient patient) {
-        if (patients.stream()
-                .filter(existing -> existing != patient)
-                .anyMatch(existing -> existing.hasSameEmail(patient))) {
+    public Patient add(Patient patient) {
+        boolean emailAlreadyExists = patients.stream()
+                .anyMatch(existing -> existing.hasSameEmail(patient));
+        if (emailAlreadyExists) {
             throw new PatientAlreadyExistsException(patient.getEmail());
         }
+        patients.add(patient);
+        return patient;
+    }
 
-        if (!patients.contains(patient)) {
-            patients.add(patient);
+    public Patient update(Patient patient) {
+        boolean emailAlreadyTaken = patients.stream()
+                .filter(existing -> existing != patient)
+                .anyMatch(existing -> existing.hasSameEmail(patient));
+        if (emailAlreadyTaken) {
+            throw new PatientAlreadyExistsException(patient.getEmail());
         }
         return patient;
     }

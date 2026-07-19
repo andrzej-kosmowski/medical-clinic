@@ -33,7 +33,7 @@ public class PatientService {
     public PatientDto addPatient(CreatePatientCommand command) {
         Patient patient = patientMapper.from(command);
         patient.validate();
-        Patient saved = patientRepository.save(patient);
+        Patient saved = patientRepository.add(patient);
         return patientMapper.toDto(saved);
     }
 
@@ -45,14 +45,14 @@ public class PatientService {
     public PatientDto updatePatientByEmail(String email, UpdatePatientCommand command) {
         Patient existing = findPatientOrThrow(email);
         existing.update(command);
-        Patient updated = patientRepository.save(existing);
+        Patient updated = patientRepository.update(existing);
         return patientMapper.toDto(updated);
     }
 
     public void changePassword(String email, ChangePasswordCommand command) {
         Patient patient = findPatientOrThrow(email);
-        patient.changePassword(command.newPassword());
-        patientRepository.save(patient);
+        patient.changePassword(command.password());
+        patientRepository.update(patient);
     }
 
     private Patient findPatientOrThrow(String email) {
