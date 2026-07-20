@@ -3,9 +3,8 @@ package com.andrzej_kosmowski.medical_clinic.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.CONFLICT)
-public class PatientAlreadyExistsException extends RuntimeException {
+public class PatientAlreadyExistsException extends MedicalClinicException {
     public PatientAlreadyExistsException(String message) {
-        super("Patient with email " + message + " already exists");
+        super("Patient with email " + message + " already exists", HttpStatus.CONFLICT);
     }
 }
