@@ -2,22 +2,38 @@ package com.andrzej_kosmowski.medical_clinic.model;
 
 import com.andrzej_kosmowski.medical_clinic.dto.UpdatePatientCommand;
 import com.andrzej_kosmowski.medical_clinic.exception.InvalidPatientDataException;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDate;
 
-@Data
-@NoArgsConstructor
+@Entity
+@Table(name = "patients")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Patient {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false, unique = true)
     private String idCardNo;
+
+    @Column(nullable = false)
     private String firstName;
+
+    @Column(nullable = false)
     private String lastName;
+
     private String phoneNumber;
+
     private LocalDate birthday;
 
     public void validate() {
@@ -55,12 +71,6 @@ public class Patient {
         this.birthday = command.birthday();
         this.idCardNo = command.idCardNo();
         this.validate();
-    }
-
-    public boolean hasSameEmail(Patient patient) {
-        return patient != null
-                && this.email != null
-                && this.email.equalsIgnoreCase(patient.getEmail());
     }
 
     public void changePassword(String newPassword) {

@@ -4,6 +4,7 @@ import com.andrzej_kosmowski.medical_clinic.dto.ChangePasswordCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.CreatePatientCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.PatientDto;
 import com.andrzej_kosmowski.medical_clinic.dto.UpdatePatientCommand;
+import com.andrzej_kosmowski.medical_clinic.exception.PatientAlreadyExistsException;
 import com.andrzej_kosmowski.medical_clinic.exception.PatientNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.mapper.PatientMapper;
 import com.andrzej_kosmowski.medical_clinic.model.Patient;
@@ -31,9 +32,12 @@ public class PatientService {
     }
 
     public PatientDto addPatient(CreatePatientCommand command) {
+        if (patientRepository.existsByEmail(command.email())) {
+            throw new PatientAlreadyExistsException(command.email());
+        }
         Patient patient = patientMapper.from(command);
         patient.validate();
-        Patient saved = patientRepository.add(patient);
+        Patient saved = patientRepository.save(patient);
         return patientMapper.toDto(saved);
     }
 
@@ -45,14 +49,14 @@ public class PatientService {
     public PatientDto updatePatientByEmail(String email, UpdatePatientCommand command) {
         Patient existing = findPatientOrThrow(email);
         existing.update(command);
-        Patient updated = patientRepository.update(existing);
+        Patient updated = patientRepository.save(existing);
         return patientMapper.toDto(updated);
     }
 
     public void changePassword(String email, ChangePasswordCommand command) {
         Patient patient = findPatientOrThrow(email);
         patient.changePassword(command.password());
-        patientRepository.update(patient);
+        patientRepository.save(patient);
     }
 
     private Patient findPatientOrThrow(String email) {
