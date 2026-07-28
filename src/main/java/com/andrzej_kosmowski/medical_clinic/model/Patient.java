@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "patients")
@@ -16,12 +17,6 @@ public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column(nullable = false)
-    private String password;
 
     @Column(nullable = false, unique = true)
     private String idCardNo;
@@ -36,16 +31,15 @@ public class Patient {
 
     private LocalDate birthday;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
+
+    public void assignUser(User user) {
+        this.user = Objects.requireNonNull(user);
+    }
+
     public void validate() {
-        if (email == null || email.isBlank()) {
-            throw new InvalidPatientDataException("Email cannot be empty");
-        }
-        if (!email.contains("@")) {
-            throw new InvalidPatientDataException("Invalid email");
-        }
-        if (password == null || password.length() < 6) {
-            throw new InvalidPatientDataException("Password must have at least 6 characters");
-        }
         if (idCardNo == null || idCardNo.isBlank()) {
             throw new InvalidPatientDataException("idCardNo cannot be empty");
         }
@@ -64,19 +58,11 @@ public class Patient {
     }
 
     public void update(UpdatePatientCommand command) {
-        this.email = command.email();
         this.firstName = command.firstName();
         this.lastName = command.lastName();
         this.phoneNumber = command.phoneNumber();
         this.birthday = command.birthday();
         this.idCardNo = command.idCardNo();
         this.validate();
-    }
-
-    public void changePassword(String newPassword) {
-        if (newPassword == null || newPassword.length() < 6) {
-            throw new InvalidPatientDataException("Password must have at least 6 characters");
-        }
-        this.password = newPassword;
     }
 }

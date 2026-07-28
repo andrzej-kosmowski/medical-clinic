@@ -8,6 +8,7 @@ import com.andrzej_kosmowski.medical_clinic.exception.PatientAlreadyExistsExcept
 import com.andrzej_kosmowski.medical_clinic.exception.PatientNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.mapper.PatientMapper;
 import com.andrzej_kosmowski.medical_clinic.model.Patient;
+import com.andrzej_kosmowski.medical_clinic.model.User;
 import com.andrzej_kosmowski.medical_clinic.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PatientService {
     private final PatientRepository patientRepository;
+    private final UserService userService;
     private final PatientMapper patientMapper;
 
     public List<PatientDto> getAllPatients() {
@@ -32,11 +34,13 @@ public class PatientService {
     }
 
     public PatientDto addPatient(CreatePatientCommand command) {
-        if (patientRepository.existsByEmail(command.email())) {
-            throw new PatientAlreadyExistsException(command.email());
+        if (patientRepository.existsByIdCardNo(command.idCardNo())) {
+            throw new PatientAlreadyExistsException(command.idCardNo());
         }
         Patient patient = patientMapper.from(command);
         patient.validate();
+        User user = userService.createUser(command.email(), command.password());
+        patient.assignUser(user);
         Patient saved = patientRepository.save(patient);
         return patientMapper.toDto(saved);
     }
@@ -47,6 +51,9 @@ public class PatientService {
     }
 
     public PatientDto updatePatientByEmail(String email, UpdatePatientCommand command) {
+        if (patientRepository.existsByIdCardNo(command.idCardNo())) {
+            throw new PatientAlreadyExistsException(command.idCardNo());
+        }
         Patient existing = findPatientOrThrow(email);
         existing.update(command);
         Patient updated = patientRepository.save(existing);
@@ -55,12 +62,12 @@ public class PatientService {
 
     public void changePassword(String email, ChangePasswordCommand command) {
         Patient patient = findPatientOrThrow(email);
-        patient.changePassword(command.password());
+        patient.getUser().changePassword(command.password());
         patientRepository.save(patient);
     }
 
     private Patient findPatientOrThrow(String email) {
-        return patientRepository.findByEmail(email)
+        return patientRepository.findByUserEmail(email)
                 .orElseThrow(() -> new PatientNotFoundException(email));
     }
 }
