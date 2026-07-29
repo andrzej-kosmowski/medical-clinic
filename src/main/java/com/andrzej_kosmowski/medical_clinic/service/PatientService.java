@@ -1,11 +1,12 @@
 package com.andrzej_kosmowski.medical_clinic.service;
 
-import com.andrzej_kosmowski.medical_clinic.dto.ChangePasswordCommand;
-import com.andrzej_kosmowski.medical_clinic.dto.CreatePatientCommand;
-import com.andrzej_kosmowski.medical_clinic.dto.PatientDto;
-import com.andrzej_kosmowski.medical_clinic.dto.UpdatePatientCommand;
-import com.andrzej_kosmowski.medical_clinic.exception.PatientAlreadyExistsException;
-import com.andrzej_kosmowski.medical_clinic.exception.PatientNotFoundException;
+import com.andrzej_kosmowski.medical_clinic.dto.patient.CreatePatientCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.patient.PatientDto;
+import com.andrzej_kosmowski.medical_clinic.dto.patient.UpdatePatientCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.user.ChangePasswordCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.user.CreateUserCommand;
+import com.andrzej_kosmowski.medical_clinic.exception.patient.PatientAlreadyExistsException;
+import com.andrzej_kosmowski.medical_clinic.exception.patient.PatientNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.mapper.PatientMapper;
 import com.andrzej_kosmowski.medical_clinic.model.Patient;
 import com.andrzej_kosmowski.medical_clinic.model.User;
@@ -39,11 +40,13 @@ public class PatientService {
         }
         Patient patient = patientMapper.from(command);
         patient.validate();
-        User user = userService.createUser(
+        CreateUserCommand userCommand = new CreateUserCommand(
                 command.firstName(),
                 command.lastName(),
                 command.email(),
-                command.password());
+                command.password()
+        );
+        User user = userService.createUser(userCommand);
         patient.assignUser(user);
         Patient saved = patientRepository.save(patient);
         return patientMapper.toDto(saved);

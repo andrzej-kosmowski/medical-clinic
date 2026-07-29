@@ -1,10 +1,10 @@
 package com.andrzej_kosmowski.medical_clinic.service;
 
-import com.andrzej_kosmowski.medical_clinic.dto.CreateFacilityCommand;
-import com.andrzej_kosmowski.medical_clinic.dto.FacilityDto;
-import com.andrzej_kosmowski.medical_clinic.dto.UpdateFacilityCommand;
-import com.andrzej_kosmowski.medical_clinic.exception.FacilityAlreadyExistsException;
-import com.andrzej_kosmowski.medical_clinic.exception.FacilityNotFoundException;
+import com.andrzej_kosmowski.medical_clinic.dto.facility.CreateFacilityCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.facility.FacilityDto;
+import com.andrzej_kosmowski.medical_clinic.dto.facility.UpdateFacilityCommand;
+import com.andrzej_kosmowski.medical_clinic.exception.facility.FacilityAlreadyExistsException;
+import com.andrzej_kosmowski.medical_clinic.exception.facility.FacilityNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.mapper.FacilityMapper;
 import com.andrzej_kosmowski.medical_clinic.model.Facility;
 import com.andrzej_kosmowski.medical_clinic.repository.FacilityRepository;

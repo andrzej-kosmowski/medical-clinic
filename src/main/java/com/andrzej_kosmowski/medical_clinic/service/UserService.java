@@ -1,11 +1,11 @@
 package com.andrzej_kosmowski.medical_clinic.service;
 
-import com.andrzej_kosmowski.medical_clinic.dto.ChangePasswordCommand;
-import com.andrzej_kosmowski.medical_clinic.dto.CreateUserCommand;
-import com.andrzej_kosmowski.medical_clinic.dto.UpdateUserCommand;
-import com.andrzej_kosmowski.medical_clinic.dto.UserDto;
-import com.andrzej_kosmowski.medical_clinic.exception.UserAlreadyExistsException;
-import com.andrzej_kosmowski.medical_clinic.exception.UserNotFoundException;
+import com.andrzej_kosmowski.medical_clinic.dto.user.ChangePasswordCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.user.CreateUserCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.user.UpdateUserCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.user.UserDto;
+import com.andrzej_kosmowski.medical_clinic.exception.user.UserAlreadyExistsException;
+import com.andrzej_kosmowski.medical_clinic.exception.user.UserNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.mapper.UserMapper;
 import com.andrzej_kosmowski.medical_clinic.model.User;
 import com.andrzej_kosmowski.medical_clinic.repository.UserRepository;
@@ -43,12 +43,11 @@ public class UserService {
         return userMapper.toDto(saved);
     }
 
-    public User createUser(String firstName, String lastName,String email, String password) {
-        if (userRepository.existsByEmail(email)) {
-            throw new UserAlreadyExistsException(email);
+    public User createUser(CreateUserCommand command) {
+        if (userRepository.existsByEmail(command.email())) {
+            throw new UserAlreadyExistsException(command.email());
         }
-
-        User user = new User(firstName, lastName, email, password);
+        User user = userMapper.from(command);
         user.validate();
         return userRepository.save(user);
     }

@@ -1,6 +1,9 @@
 package com.andrzej_kosmowski.medical_clinic.controller;
 
 import com.andrzej_kosmowski.medical_clinic.dto.*;
+import com.andrzej_kosmowski.medical_clinic.dto.facility.CreateFacilityCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.facility.FacilityDto;
+import com.andrzej_kosmowski.medical_clinic.dto.facility.UpdateFacilityCommand;
 import com.andrzej_kosmowski.medical_clinic.service.FacilityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -1,7 +1,7 @@
 package com.andrzej_kosmowski.medical_clinic.mapper;
 
-import com.andrzej_kosmowski.medical_clinic.dto.CreateFacilityCommand;
-import com.andrzej_kosmowski.medical_clinic.dto.FacilityDto;
+import com.andrzej_kosmowski.medical_clinic.dto.facility.CreateFacilityCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.facility.FacilityDto;
 import com.andrzej_kosmowski.medical_clinic.model.Facility;
 import org.mapstruct.Mapper;
 

@@ -1,4 +1,4 @@
-package com.andrzej_kosmowski.medical_clinic.dto;
+package com.andrzej_kosmowski.medical_clinic.dto.facility;
 
 public record CreateFacilityCommand(
         String name,

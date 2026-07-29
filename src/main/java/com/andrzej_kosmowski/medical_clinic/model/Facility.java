@@ -1,7 +1,7 @@
 package com.andrzej_kosmowski.medical_clinic.model;
 
-import com.andrzej_kosmowski.medical_clinic.dto.UpdateFacilityCommand;
-import com.andrzej_kosmowski.medical_clinic.exception.InvalidFacilityDataException;
+import com.andrzej_kosmowski.medical_clinic.dto.facility.UpdateFacilityCommand;
+import com.andrzej_kosmowski.medical_clinic.exception.facility.InvalidFacilityDataException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

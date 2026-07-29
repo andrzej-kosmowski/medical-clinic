@@ -1,6 +1,10 @@
 package com.andrzej_kosmowski.medical_clinic.controller;
 
 import com.andrzej_kosmowski.medical_clinic.dto.*;
+import com.andrzej_kosmowski.medical_clinic.dto.patient.CreatePatientCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.patient.PatientDto;
+import com.andrzej_kosmowski.medical_clinic.dto.patient.UpdatePatientCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.user.ChangePasswordCommand;
 import com.andrzej_kosmowski.medical_clinic.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -1,7 +1,12 @@
 package com.andrzej_kosmowski.medical_clinic.service;
 
-import com.andrzej_kosmowski.medical_clinic.dto.*;
-import com.andrzej_kosmowski.medical_clinic.exception.DoctorNotFoundException;
+import com.andrzej_kosmowski.medical_clinic.dto.user.CreateUserCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.doctor.AssignFacilityCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.doctor.CreateDoctorCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.doctor.DoctorDto;
+import com.andrzej_kosmowski.medical_clinic.dto.doctor.UpdateDoctorCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.facility.FacilityDto;
+import com.andrzej_kosmowski.medical_clinic.exception.doctor.DoctorNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.mapper.DoctorMapper;
 import com.andrzej_kosmowski.medical_clinic.mapper.FacilityMapper;
 import com.andrzej_kosmowski.medical_clinic.model.Doctor;
@@ -46,12 +51,13 @@ public class DoctorService {
     }
 
     public DoctorDto addDoctor(CreateDoctorCommand command) {
-        User user = userService.createUser(
+        CreateUserCommand userCommand = new CreateUserCommand(
                 command.firstName(),
                 command.lastName(),
                 command.email(),
                 command.password()
         );
+        User user = userService.createUser(userCommand);
         Doctor doctor = new Doctor(command.specialization());
         doctor.validate();
         doctor.assignUser(user);
@@ -63,7 +69,7 @@ public class DoctorService {
         return doctorMapper.toDto(saved);
     }
 
-    public DoctorDto updateDoctorByEmail(String email,UpdateDoctorCommand command) {
+    public DoctorDto updateDoctorByEmail(String email, UpdateDoctorCommand command) {
         Doctor doctor = findDoctorOrThrow(email);
         userService.validateEmailChange(
                 doctor.getUser(),

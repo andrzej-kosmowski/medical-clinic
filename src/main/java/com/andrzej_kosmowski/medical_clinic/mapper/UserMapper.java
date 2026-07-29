@@ -1,7 +1,7 @@
 package com.andrzej_kosmowski.medical_clinic.mapper;
 
-import com.andrzej_kosmowski.medical_clinic.dto.CreateUserCommand;
-import com.andrzej_kosmowski.medical_clinic.dto.UserDto;
+import com.andrzej_kosmowski.medical_clinic.dto.user.CreateUserCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.user.UserDto;
 import com.andrzej_kosmowski.medical_clinic.model.User;
 import org.mapstruct.Mapper;
 

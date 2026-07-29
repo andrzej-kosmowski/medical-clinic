@@ -1,6 +1,6 @@
 package com.andrzej_kosmowski.medical_clinic.model;
 
-import com.andrzej_kosmowski.medical_clinic.exception.InvalidDoctorDataException;
+import com.andrzej_kosmowski.medical_clinic.exception.doctor.InvalidDoctorDataException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

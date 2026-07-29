@@ -1,7 +1,7 @@
 package com.andrzej_kosmowski.medical_clinic.model;
 
-import com.andrzej_kosmowski.medical_clinic.dto.UpdatePatientCommand;
-import com.andrzej_kosmowski.medical_clinic.exception.InvalidPatientDataException;
+import com.andrzej_kosmowski.medical_clinic.dto.patient.UpdatePatientCommand;
+import com.andrzej_kosmowski.medical_clinic.exception.patient.InvalidPatientDataException;
 import jakarta.persistence.*;
 import lombok.*;
 
