@@ -21,12 +21,6 @@ public class Patient {
     @Column(nullable = false, unique = true)
     private String idCardNo;
 
-    @Column(nullable = false)
-    private String firstName;
-
-    @Column(nullable = false)
-    private String lastName;
-
     private String phoneNumber;
 
     private LocalDate birthday;
@@ -43,12 +37,6 @@ public class Patient {
         if (idCardNo == null || idCardNo.isBlank()) {
             throw new InvalidPatientDataException("idCardNo cannot be empty");
         }
-        if (firstName == null || firstName.isBlank()) {
-            throw new InvalidPatientDataException("First name cannot be empty");
-        }
-        if (lastName == null || lastName.isBlank()) {
-            throw new InvalidPatientDataException("Last name cannot be empty");
-        }
         if (phoneNumber != null && !phoneNumber.matches("^\\d{9}$")) {
             throw new InvalidPatientDataException("Phone must have 9 digits");
         }
@@ -58,8 +46,6 @@ public class Patient {
     }
 
     public void update(UpdatePatientCommand command) {
-        this.firstName = command.firstName();
-        this.lastName = command.lastName();
         this.phoneNumber = command.phoneNumber();
         this.birthday = command.birthday();
         this.idCardNo = command.idCardNo();

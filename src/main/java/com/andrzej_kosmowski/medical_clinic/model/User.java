@@ -1,5 +1,6 @@
 package com.andrzej_kosmowski.medical_clinic.model;
 
+import com.andrzej_kosmowski.medical_clinic.exception.InvalidPatientDataException;
 import com.andrzej_kosmowski.medical_clinic.exception.InvalidUserDataException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -15,6 +16,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastName;
+
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -24,13 +31,17 @@ public class User {
     @OneToOne(mappedBy = "user")
     private Patient patient;
 
-    public User(String email, String password) {
+    public User(String firstName, String lastName, String email, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
     }
 
 
-    public void updateEmail(String email) {
+    public void update(String firstName, String lastName, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.validate();
     }
@@ -41,6 +52,12 @@ public class User {
         }
         if (!email.contains("@")) {
             throw new InvalidUserDataException("Invalid email");
+        }
+        if (firstName == null || firstName.isBlank()) {
+            throw new InvalidPatientDataException("First name cannot be empty");
+        }
+        if (lastName == null || lastName.isBlank()) {
+            throw new InvalidPatientDataException("Last name cannot be empty");
         }
         if (password == null || password.length() < 6) {
             throw new InvalidUserDataException("Password must have at least 6 characters");

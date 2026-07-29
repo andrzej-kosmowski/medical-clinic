@@ -43,22 +43,20 @@ public class UserService {
         return userMapper.toDto(saved);
     }
 
-    public User createUser(String email, String password) {
+    public User createUser(String firstName, String lastName,String email, String password) {
         if (userRepository.existsByEmail(email)) {
             throw new UserAlreadyExistsException(email);
         }
 
-        User user = new User(email, password);
+        User user = new User(firstName, lastName, email, password);
         user.validate();
         return userRepository.save(user);
     }
 
     public UserDto updateUser(String email,UpdateUserCommand command) {
-        if(userRepository.existsByEmail(command.email())){
-            throw new UserAlreadyExistsException(command.email());
-        }
+
         User user = findUserOrThrow(email);
-        user.updateEmail(command.email());
+        user.update(command.firstName(), command.lastName(), command.email());
         User updated = userRepository.save(user);
         return userMapper.toDto(updated);
     }

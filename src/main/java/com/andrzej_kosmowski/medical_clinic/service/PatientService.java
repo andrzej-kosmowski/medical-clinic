@@ -39,7 +39,11 @@ public class PatientService {
         }
         Patient patient = patientMapper.from(command);
         patient.validate();
-        User user = userService.createUser(command.email(), command.password());
+        User user = userService.createUser(
+                command.firstName(),
+                command.lastName(),
+                command.email(),
+                command.password());
         patient.assignUser(user);
         Patient saved = patientRepository.save(patient);
         return patientMapper.toDto(saved);
@@ -51,11 +55,13 @@ public class PatientService {
     }
 
     public PatientDto updatePatientByEmail(String email, UpdatePatientCommand command) {
-        if (patientRepository.existsByIdCardNo(command.idCardNo())) {
-            throw new PatientAlreadyExistsException(command.idCardNo());
-        }
         Patient existing = findPatientOrThrow(email);
         existing.update(command);
+        existing.getUser().update(
+                command.firstName(),
+                command.lastName(),
+                command.email()
+        );
         Patient updated = patientRepository.save(existing);
         return patientMapper.toDto(updated);
     }
