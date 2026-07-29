@@ -1,0 +1,73 @@
+package com.andrzej_kosmowski.medical_clinic.model;
+
+import com.andrzej_kosmowski.medical_clinic.dto.UpdateFacilityCommand;
+import com.andrzej_kosmowski.medical_clinic.exception.InvalidFacilityDataException;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Entity
+@Table(name = "facilities")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Facility {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String name;
+
+    @Column(nullable = false)
+    private String city;
+
+    @Column(nullable = false)
+    private String zipCode;
+
+    @Column(nullable = false)
+    private String street;
+
+    @Column(nullable = false)
+    private String buildingNumber;
+
+    @OneToMany(mappedBy = "facility")
+    private List<Doctor> doctors;
+
+    public Facility(String name, String city, String zipCode, String street, String buildingNumber) {
+        this.name = name;
+        this.city = city;
+        this.zipCode = zipCode;
+        this.street = street;
+        this.buildingNumber = buildingNumber;
+    }
+
+    public void update(UpdateFacilityCommand command) {
+        this.name = command.name();
+        this.city = command.city();
+        this.zipCode = command.zipCode();
+        this.street = command.street();
+        this.buildingNumber = command.buildingNumber();
+        this.validate();
+    }
+
+        public void validate() {
+        if (name == null || name.isBlank()) {
+            throw new InvalidFacilityDataException("Name cannot be empty");
+        }
+        if (city == null || city.isBlank()) {
+            throw new InvalidFacilityDataException("City cannot be empty");
+        }
+        if (zipCode == null || !zipCode.matches("^\\d{2}-\\d{3}$")) {
+            throw new InvalidFacilityDataException("Zip code must match format XX-XXX");
+        }
+        if (street == null || street.isBlank()) {
+            throw new InvalidFacilityDataException("Street cannot be empty");
+        }
+        if (buildingNumber == null || buildingNumber.isBlank()) {
+            throw new InvalidFacilityDataException("Building number cannot be empty");
+        }
+    }
+}

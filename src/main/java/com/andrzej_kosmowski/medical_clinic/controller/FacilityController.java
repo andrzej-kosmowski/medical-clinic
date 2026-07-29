@@ -1,0 +1,80 @@
+package com.andrzej_kosmowski.medical_clinic.controller;
+
+import com.andrzej_kosmowski.medical_clinic.dto.*;
+import com.andrzej_kosmowski.medical_clinic.service.FacilityService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(value = "/facilities", produces = "application/json")
+@RequiredArgsConstructor
+@Tag(name = "Facilities", description = "Facility management endpoints")
+public class FacilityController {
+    private final FacilityService facilityService;
+
+    @Operation(summary = "Get all facilities")
+    @ApiResponse(responseCode = "200", description = "List of facilities returned successfully")
+    @GetMapping
+    public List<FacilityDto> getAll() {
+        return facilityService.getAllFacilities();
+    }
+
+    @Operation(summary = "Get facility by name")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Facility found"),
+        @ApiResponse(responseCode = "404", description = "Facility not found",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
+    })
+    @GetMapping("/{name}")
+    public FacilityDto getByName(@PathVariable String name) {
+        return facilityService.getFacilityByName(name);
+    }
+
+    @Operation(summary = "Create new facility")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Facility created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid facility data",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDto.class))),
+        @ApiResponse(responseCode = "409", description = "Facility already exists",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
+    })
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public FacilityDto create(@RequestBody CreateFacilityCommand command) {
+        return facilityService.addFacility(command);
+    }
+
+    @Operation(summary = "Update facility")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Facility updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid facility data",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDto.class))),
+        @ApiResponse(responseCode = "404", description = "Facility not found",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
+    })
+    @PutMapping("/{name}")
+    public FacilityDto update(@PathVariable String name, @RequestBody UpdateFacilityCommand command) {
+        return facilityService.updateFacility(name, command);
+    }
+
+    @Operation(summary = "Delete facility")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Facility deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Facility not found",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
+    })
+    @DeleteMapping("/{name}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable String name) {
+        facilityService.deleteFacilityByName(name);
+    }
+}
