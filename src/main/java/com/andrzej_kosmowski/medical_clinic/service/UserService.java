@@ -55,10 +55,7 @@ public class UserService {
 
     public UserDto updateUser(String email,UpdateUserCommand command) {
         User user = findUserOrThrow(email);
-        if (!user.getEmail().equals(command.email())
-                && userRepository.existsByEmail(command.email())) {
-            throw new UserAlreadyExistsException(command.email());
-        }
+        this.validateEmailChange(user, command.email());
         user.update(command.firstName(), command.lastName(), command.email());
         User updated = userRepository.save(user);
         return userMapper.toDto(updated);
@@ -73,6 +70,12 @@ public class UserService {
         User user = findUserOrThrow(email);
         user.changePassword(command.password());
         userRepository.save(user);
+    }
+
+    public void validateEmailChange(User user, String newEmail) {
+        if (!user.getEmail().equals(newEmail) && userRepository.existsByEmail(newEmail)) {
+            throw new UserAlreadyExistsException(newEmail);
+        }
     }
 
     private User findUserOrThrow(String email) {

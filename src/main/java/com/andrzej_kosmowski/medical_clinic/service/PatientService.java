@@ -56,6 +56,9 @@ public class PatientService {
 
     public PatientDto updatePatientByEmail(String email, UpdatePatientCommand command) {
         Patient existing = findPatientOrThrow(email);
+        userService.validateEmailChange(
+                existing.getUser(),
+                command.email());
         existing.update(command);
         existing.getUser().update(
                 command.firstName(),
