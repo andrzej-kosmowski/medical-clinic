@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatus;
 
 public class InvalidUserDataException extends MedicalClinicException {
     public InvalidUserDataException(String message) {
-        super(message, HttpStatus.CONFLICT);
+        super(message, HttpStatus.BAD_REQUEST);
     }
 }
