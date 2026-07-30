@@ -12,7 +12,6 @@ import java.util.Objects;
 @Table(name = "patients")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,8 +28,15 @@ public class Patient {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+    public Patient(String idCardNo, String phoneNumber, LocalDate birthday) {
+        this.idCardNo = idCardNo;
+        this.phoneNumber = phoneNumber;
+        this.birthday = birthday;
+    }
+
     public void assignUser(User user) {
-        this.user = Objects.requireNonNull(user);
+        this.user = user;
+        user.assignPatient(this);
     }
 
     public void validate() {

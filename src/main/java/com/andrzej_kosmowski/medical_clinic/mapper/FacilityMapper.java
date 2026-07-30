@@ -9,4 +9,8 @@ import org.mapstruct.Mapper;
 public interface FacilityMapper {
     Facility from(CreateFacilityCommand command);
     FacilityDto toDto(Facility facility);
+
+    default String toName(Facility facility) {
+        return facility.getName();
+    }
 }

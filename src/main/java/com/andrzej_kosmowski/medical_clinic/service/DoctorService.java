@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -38,15 +40,10 @@ public class DoctorService {
         return doctorMapper.toDto(doctor);
     }
 
-    public FacilityDto getFacility(String email) {
+    public List<FacilityDto> getFacilities(String email) {
         Doctor doctor = findDoctorOrThrow(email);
-        return facilityMapper.toDto(doctor.getFacility());
-    }
-
-    public List<DoctorDto> getDoctorsByFacility(String facilityName) {
-        return doctorRepository.findAllByFacilityName(facilityName)
-                .stream()
-                .map(doctorMapper::toDto)
+        return doctor.getFacilities().stream()
+                .map(facilityMapper::toDto)
                 .toList();
     }
 
@@ -59,12 +56,14 @@ public class DoctorService {
         );
         User user = userService.createUser(userCommand);
         Doctor doctor = new Doctor(command.specialization());
-        doctor.validate();
         doctor.assignUser(user);
-        if (command.facilityName() != null) {
-            Facility facility = facilityService.getByName(command.facilityName());
-            doctor.assignFacility(facility);
-        }
+        doctor.validate();
+        Optional.ofNullable(command.facilityNames())
+                .orElse(Set.of())
+                .forEach(name -> {
+                    Facility facility = facilityService.getByName(name);
+                    doctor.assignFacility(facility);
+                });
         Doctor saved  = doctorRepository.save(doctor);
         return doctorMapper.toDto(saved);
     }
@@ -97,9 +96,10 @@ public class DoctorService {
         return doctorMapper.toDto(assigned);
     }
 
-    public void removeFacility(String email) {
+    public void removeFacility(String email, String facilityName) {
         Doctor doctor = findDoctorOrThrow(email);
-        doctor.removeFacility();
+        Facility facility = facilityService.getByName(facilityName);
+        doctor.removeFacility(facility);
         doctorRepository.save(doctor);
     }
 

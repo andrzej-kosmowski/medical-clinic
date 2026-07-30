@@ -1,6 +1,7 @@
 package com.andrzej_kosmowski.medical_clinic.controller;
 
 import com.andrzej_kosmowski.medical_clinic.dto.*;
+import com.andrzej_kosmowski.medical_clinic.dto.doctor.DoctorDto;
 import com.andrzej_kosmowski.medical_clinic.dto.facility.CreateFacilityCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.facility.FacilityDto;
 import com.andrzej_kosmowski.medical_clinic.dto.facility.UpdateFacilityCommand;
@@ -40,6 +41,17 @@ public class FacilityController {
     @GetMapping("/{name}")
     public FacilityDto getByName(@PathVariable String name) {
         return facilityService.getFacilityByName(name);
+    }
+
+    @Operation(summary = "Get doctors assigned to facility")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Doctors found"),
+        @ApiResponse(responseCode = "404", description = "Facility not found",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
+    })
+    @GetMapping("/{name}/doctors")
+    public List<DoctorDto> getDoctors(@PathVariable String name) {
+        return facilityService.getDoctors(name);
     }
 
     @Operation(summary = "Create new facility")

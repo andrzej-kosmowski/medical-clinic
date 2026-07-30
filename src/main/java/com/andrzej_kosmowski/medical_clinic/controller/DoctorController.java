@@ -44,25 +44,15 @@ public class DoctorController {
         return doctorService.getDoctorByEmail(email);
     }
 
-    @Operation(summary = "Get doctor facility")
+    @Operation(summary = "Get doctor facilities")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Facility found"),
-            @ApiResponse(responseCode = "404", description = "Facility not found",
-                    content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
+        @ApiResponse(responseCode = "200", description = "Facilities found"),
+        @ApiResponse(responseCode = "404", description = "Facilities not found",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @GetMapping("/{email}/facility")
-    public FacilityDto getFacility(@PathVariable String email) {
-        return doctorService.getFacility(email);
-    }
-
-
-    @Operation(summary = "Get all doctors from facility")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "List of doctors returned successfully")
-    })
-    @GetMapping("/facility/{facilityName}")
-    public List<DoctorDto> getAllDoctors(@PathVariable String facilityName) {
-        return doctorService.getDoctorsByFacility(facilityName);
+    @GetMapping("/{email}/facilities")
+    public List<FacilityDto> getFacilities(@PathVariable String email) {
+        return doctorService.getFacilities(email);
     }
 
     @Operation(summary = "Create new doctor")
@@ -121,12 +111,12 @@ public class DoctorController {
     @Operation(summary = "Remove facility from doctor")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Facility removed successfully"),
-        @ApiResponse(responseCode = "404", description = "Doctor not found",
+        @ApiResponse(responseCode = "404", description = "Doctor or facility not found",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @DeleteMapping("/{email}/facility")
+    @DeleteMapping("/{email}/facility/{facilityName}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeFacility(@PathVariable String email) {
-        doctorService.removeFacility(email);
+    public void removeFacility(@PathVariable String email, @PathVariable String facilityName) {
+        doctorService.removeFacility(email, facilityName);
     }
 }

@@ -31,6 +31,9 @@ public class User {
     @OneToOne(mappedBy = "user")
     private Patient patient;
 
+    @OneToOne(mappedBy = "user")
+    private Doctor doctor;
+
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -38,6 +41,13 @@ public class User {
         this.password = password;
     }
 
+    public void assignPatient(Patient patient) {
+        this.patient = patient;
+    }
+
+    public void assignDoctor(Doctor doctor) {
+        this.doctor = doctor;
+    }
 
     public void update(String firstName, String lastName, String email) {
         this.firstName = firstName;
@@ -54,10 +64,10 @@ public class User {
             throw new InvalidUserDataException("Invalid email");
         }
         if (firstName == null || firstName.isBlank()) {
-            throw new InvalidPatientDataException("First name cannot be empty");
+            throw new InvalidUserDataException("First name cannot be empty");
         }
         if (lastName == null || lastName.isBlank()) {
-            throw new InvalidPatientDataException("Last name cannot be empty");
+            throw new InvalidUserDataException("Last name cannot be empty");
         }
         if (password == null || password.length() < 6) {
             throw new InvalidUserDataException("Password must have at least 6 characters");

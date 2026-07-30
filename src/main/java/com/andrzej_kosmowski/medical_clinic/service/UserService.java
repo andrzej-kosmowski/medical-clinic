@@ -32,15 +32,8 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
-    public UserDto addUser(CreateUserCommand command) {
-        if (userRepository.existsByEmail(command.email())) {
-            throw new UserAlreadyExistsException(command.email());
-        }
-
-        User user = userMapper.from(command);
-        user.validate();
-        User saved = userRepository.save(user);
-        return userMapper.toDto(saved);
+    public UserDto addUser(CreateUserCommand command) {;
+        return userMapper.toDto(createUser(command));
     }
 
     public User createUser(CreateUserCommand command) {

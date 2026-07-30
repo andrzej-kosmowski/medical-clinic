@@ -7,7 +7,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "facilities")
@@ -33,8 +34,16 @@ public class Facility {
     @Column(nullable = false)
     private String buildingNumber;
 
-    @OneToMany(mappedBy = "facility")
-    private List<Doctor> doctors;
+    @ManyToMany(mappedBy = "facilities")
+    private Set<Doctor> doctors = new HashSet<>();
+
+    public void assignDoctor(Doctor doctor) {
+        doctors.add(doctor);
+    }
+
+    public void removeDoctor(Doctor doctor) {
+        doctors.remove(doctor);
+    }
 
     public Facility(String name, String city, String zipCode, String street, String buildingNumber) {
         this.name = name;
@@ -53,7 +62,7 @@ public class Facility {
         this.validate();
     }
 
-        public void validate() {
+    public void validate() {
         if (name == null || name.isBlank()) {
             throw new InvalidFacilityDataException("Name cannot be empty");
         }

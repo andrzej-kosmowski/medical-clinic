@@ -1,10 +1,12 @@
 package com.andrzej_kosmowski.medical_clinic.service;
 
+import com.andrzej_kosmowski.medical_clinic.dto.doctor.DoctorDto;
 import com.andrzej_kosmowski.medical_clinic.dto.facility.CreateFacilityCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.facility.FacilityDto;
 import com.andrzej_kosmowski.medical_clinic.dto.facility.UpdateFacilityCommand;
 import com.andrzej_kosmowski.medical_clinic.exception.facility.FacilityAlreadyExistsException;
 import com.andrzej_kosmowski.medical_clinic.exception.facility.FacilityNotFoundException;
+import com.andrzej_kosmowski.medical_clinic.mapper.DoctorMapper;
 import com.andrzej_kosmowski.medical_clinic.mapper.FacilityMapper;
 import com.andrzej_kosmowski.medical_clinic.model.Facility;
 import com.andrzej_kosmowski.medical_clinic.repository.FacilityRepository;
@@ -18,6 +20,7 @@ import java.util.List;
 public class FacilityService {
     private final FacilityRepository facilityRepository;
     private final FacilityMapper facilityMapper;
+    private final DoctorMapper doctorMapper;
 
     public List<FacilityDto> getAllFacilities() {
         return facilityRepository.findAll().stream()
@@ -28,6 +31,13 @@ public class FacilityService {
     public FacilityDto getFacilityByName(String name) {
         Facility facility = findFacilityOrThrow(name);
         return facilityMapper.toDto(facility);
+    }
+
+    public List<DoctorDto> getDoctors(String facilityName) {
+        Facility facility = findFacilityOrThrow(facilityName);
+        return facility.getDoctors().stream()
+                .map(doctorMapper::toDto)
+                .toList();
     }
 
     public FacilityDto addFacility(CreateFacilityCommand command) {

@@ -2,13 +2,17 @@ package com.andrzej_kosmowski.medical_clinic.model;
 
 import com.andrzej_kosmowski.medical_clinic.exception.doctor.InvalidDoctorDataException;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "doctors")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,9 +25,13 @@ public class Doctor {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "facility_id")
-    private Facility facility;
+    @ManyToMany
+    @JoinTable(
+            name = "doctor_facilities",
+            joinColumns = @JoinColumn(name = "doctor_id"),
+            inverseJoinColumns = @JoinColumn(name = "facility_id")
+    )
+    private Set<Facility> facilities = new HashSet<>();
 
     public Doctor(String specialization) {
         this.specialization = specialization;
@@ -42,12 +50,19 @@ public class Doctor {
 
     public void assignUser(User user) {
         this.user = user;
-    }
-    public void assignFacility(Facility facility) {
-        this.facility = facility;
+        user.assignDoctor(this);
     }
 
-    public void removeFacility() {
-        this.facility = null;
+    public void assignFacility(Facility facility) {
+        if (facilities.add(facility)) {
+            facility.assignDoctor(this);
+        }
     }
+
+    public void removeFacility(Facility facility) {
+        if (facilities.remove(facility)) {
+            facility.removeDoctor(this);
+        }
+    }
+
 }
