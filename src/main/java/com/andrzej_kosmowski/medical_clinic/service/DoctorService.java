@@ -13,6 +13,7 @@ import com.andrzej_kosmowski.medical_clinic.model.Doctor;
 import com.andrzej_kosmowski.medical_clinic.model.Facility;
 import com.andrzej_kosmowski.medical_clinic.model.User;
 import com.andrzej_kosmowski.medical_clinic.repository.DoctorRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +48,7 @@ public class DoctorService {
                 .toList();
     }
 
+    @Transactional
     public DoctorDto addDoctor(CreateDoctorCommand command) {
         CreateUserCommand userCommand = new CreateUserCommand(
                 command.firstName(),
@@ -58,16 +60,17 @@ public class DoctorService {
         Doctor doctor = new Doctor(command.specialization());
         doctor.assignUser(user);
         doctor.validate();
+        Doctor saved  = doctorRepository.save(doctor);
         Optional.ofNullable(command.facilityNames())
                 .orElse(Set.of())
                 .forEach(name -> {
                     Facility facility = facilityService.getByName(name);
                     doctor.assignFacility(facility);
                 });
-        Doctor saved  = doctorRepository.save(doctor);
         return doctorMapper.toDto(saved);
     }
 
+    @Transactional
     public DoctorDto updateDoctorByEmail(String email, UpdateDoctorCommand command) {
         Doctor doctor = findDoctorOrThrow(email);
         userService.validateEmailChange(
@@ -79,28 +82,28 @@ public class DoctorService {
                 command.lastName(),
                 command.email()
         );
-        Doctor updated = doctorRepository.save(doctor);
-        return doctorMapper.toDto(updated);
+        return doctorMapper.toDto(doctor);
     }
 
+    @Transactional
     public void deleteDoctorByEmail(String email) {
         Doctor doctor = findDoctorOrThrow(email);
         doctorRepository.delete(doctor);
     }
 
+    @Transactional
     public DoctorDto assignFacility(String email, AssignFacilityCommand command) {
         Doctor doctor = findDoctorOrThrow(email);
         Facility facility = facilityService.getByName(command.facilityName());
         doctor.assignFacility(facility);
-        Doctor assigned = doctorRepository.save(doctor);
-        return doctorMapper.toDto(assigned);
+        return doctorMapper.toDto(doctor);
     }
 
+    @Transactional
     public void removeFacility(String email, String facilityName) {
         Doctor doctor = findDoctorOrThrow(email);
         Facility facility = facilityService.getByName(facilityName);
         doctor.removeFacility(facility);
-        doctorRepository.save(doctor);
     }
 
     private Doctor findDoctorOrThrow(String email) {

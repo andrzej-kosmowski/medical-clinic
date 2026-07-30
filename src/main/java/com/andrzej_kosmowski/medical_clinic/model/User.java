@@ -1,6 +1,5 @@
 package com.andrzej_kosmowski.medical_clinic.model;
 
-import com.andrzej_kosmowski.medical_clinic.exception.patient.InvalidPatientDataException;
 import com.andrzej_kosmowski.medical_clinic.exception.user.InvalidUserDataException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

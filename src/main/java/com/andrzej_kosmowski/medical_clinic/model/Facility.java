@@ -38,11 +38,15 @@ public class Facility {
     private Set<Doctor> doctors = new HashSet<>();
 
     public void assignDoctor(Doctor doctor) {
-        doctors.add(doctor);
+        if (doctors.add(doctor)) {
+            doctor.getFacilities().add(this);
+        }
     }
 
     public void removeDoctor(Doctor doctor) {
-        doctors.remove(doctor);
+        if (doctors.remove(doctor)) {
+            doctor.getFacilities().remove(this);
+        }
     }
 
     public Facility(String name, String city, String zipCode, String street, String buildingNumber) {

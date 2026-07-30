@@ -10,10 +10,12 @@ import com.andrzej_kosmowski.medical_clinic.mapper.DoctorMapper;
 import com.andrzej_kosmowski.medical_clinic.mapper.FacilityMapper;
 import com.andrzej_kosmowski.medical_clinic.model.Facility;
 import com.andrzej_kosmowski.medical_clinic.repository.FacilityRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +42,7 @@ public class FacilityService {
                 .toList();
     }
 
+    @Transactional
     public FacilityDto addFacility(CreateFacilityCommand command) {
         if (facilityRepository.existsByName(command.name())) {
             throw new FacilityAlreadyExistsException(command.name());
@@ -50,6 +53,7 @@ public class FacilityService {
         return facilityMapper.toDto(saved);
     }
 
+    @Transactional
     public FacilityDto updateFacility(String name,UpdateFacilityCommand command) {
         Facility facility = findFacilityOrThrow(name);
         if (!facility.getName().equals(command.name())
@@ -57,12 +61,15 @@ public class FacilityService {
             throw new FacilityAlreadyExistsException(command.name());
         }
         facility.update(command);
-        Facility updated = facilityRepository.save(facility);
-        return facilityMapper.toDto(updated);
+        return facilityMapper.toDto(facility);
     }
 
+    @Transactional
     public void deleteFacilityByName(String name) {
         Facility facility = findFacilityOrThrow(name);
+        facility.getDoctors()
+                    .forEach(doctor -> doctor.getFacilities().remove(facility));
+        facility.getDoctors().clear();
         facilityRepository.delete(facility);
     }
 

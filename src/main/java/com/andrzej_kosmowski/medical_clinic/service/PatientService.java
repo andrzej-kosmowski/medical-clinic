@@ -11,6 +11,7 @@ import com.andrzej_kosmowski.medical_clinic.mapper.PatientMapper;
 import com.andrzej_kosmowski.medical_clinic.model.Patient;
 import com.andrzej_kosmowski.medical_clinic.model.User;
 import com.andrzej_kosmowski.medical_clinic.repository.PatientRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,7 @@ public class PatientService {
         return patientMapper.toDto(patient);
     }
 
+    @Transactional
     public PatientDto addPatient(CreatePatientCommand command) {
         if (patientRepository.existsByIdCardNo(command.idCardNo())) {
             throw new PatientAlreadyExistsException(command.idCardNo());
@@ -52,30 +54,31 @@ public class PatientService {
         return patientMapper.toDto(saved);
     }
 
+    @Transactional
     public void deletePatientByEmail(String email) {
         Patient patient = findPatientOrThrow(email);
         patientRepository.delete(patient);
     }
 
+    @Transactional
     public PatientDto updatePatientByEmail(String email, UpdatePatientCommand command) {
-        Patient existing = findPatientOrThrow(email);
+        Patient patient = findPatientOrThrow(email);
         userService.validateEmailChange(
-                existing.getUser(),
+                patient.getUser(),
                 command.email());
-        existing.update(command);
-        existing.getUser().update(
+        patient.update(command);
+        patient.getUser().update(
                 command.firstName(),
                 command.lastName(),
                 command.email()
         );
-        Patient updated = patientRepository.save(existing);
-        return patientMapper.toDto(updated);
+        return patientMapper.toDto(patient);
     }
 
+    @Transactional
     public void changePassword(String email, ChangePasswordCommand command) {
         Patient patient = findPatientOrThrow(email);
         patient.getUser().changePassword(command.password());
-        patientRepository.save(patient);
     }
 
     private Patient findPatientOrThrow(String email) {
