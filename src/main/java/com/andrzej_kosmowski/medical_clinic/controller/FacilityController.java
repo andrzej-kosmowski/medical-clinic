@@ -32,15 +32,15 @@ public class FacilityController {
         return facilityService.getAllFacilities();
     }
 
-    @Operation(summary = "Get facility by name")
+    @Operation(summary = "Get facility by id")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Facility found"),
         @ApiResponse(responseCode = "404", description = "Facility not found",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @GetMapping("/{name}")
-    public FacilityDto getByName(@PathVariable String name) {
-        return facilityService.getFacilityByName(name);
+    @GetMapping("/{id}")
+    public FacilityDto getById(@PathVariable Long id) {
+        return facilityService.getFacilityById(id);
     }
 
     @Operation(summary = "Get doctors assigned to facility")
@@ -49,9 +49,9 @@ public class FacilityController {
         @ApiResponse(responseCode = "404", description = "Facility not found",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @GetMapping("/{name}/doctors")
-    public List<DoctorDto> getDoctors(@PathVariable String name) {
-        return facilityService.getDoctors(name);
+    @GetMapping("/{id}/doctors")
+    public List<DoctorDto> getDoctors(@PathVariable Long id) {
+        return facilityService.getDoctors(id);
     }
 
     @Operation(summary = "Create new facility")
@@ -76,9 +76,9 @@ public class FacilityController {
         @ApiResponse(responseCode = "404", description = "Facility not found",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @PutMapping("/{name}")
-    public FacilityDto update(@PathVariable String name, @RequestBody UpdateFacilityCommand command) {
-        return facilityService.updateFacility(name, command);
+    @PutMapping("/{id}")
+    public FacilityDto update(@PathVariable Long id, @RequestBody UpdateFacilityCommand command) {
+        return facilityService.updateFacility(id, command);
     }
 
     @Operation(summary = "Delete facility")
@@ -87,9 +87,9 @@ public class FacilityController {
         @ApiResponse(responseCode = "404", description = "Facility not found",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @DeleteMapping("/{name}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable String name) {
-        facilityService.deleteFacilityByName(name);
+    public void delete(@PathVariable Long id) {
+        facilityService.deleteFacility(id);
     }
 }

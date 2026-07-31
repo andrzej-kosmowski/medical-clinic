@@ -8,6 +8,6 @@ public record CreateDoctorCommand(
         String firstName,
         String lastName,
         String specialization,
-        Set<String> facilityNames
+        Set<Long> facilityIds
 ) {
 }

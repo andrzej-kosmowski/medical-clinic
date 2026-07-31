@@ -4,7 +4,6 @@ import com.andrzej_kosmowski.medical_clinic.dto.patient.CreatePatientCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.patient.PatientDto;
 import com.andrzej_kosmowski.medical_clinic.dto.patient.UpdatePatientCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.user.ChangePasswordCommand;
-import com.andrzej_kosmowski.medical_clinic.dto.user.CreateUserCommand;
 import com.andrzej_kosmowski.medical_clinic.exception.patient.PatientAlreadyExistsException;
 import com.andrzej_kosmowski.medical_clinic.exception.patient.PatientNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.mapper.PatientMapper;
@@ -32,8 +31,8 @@ public class PatientService {
                 .toList();
     }
 
-    public PatientDto getPatientByEmail(String email) {
-        Patient patient = findPatientOrThrow(email);
+    public PatientDto getPatientById(Long id) {
+        Patient patient = findPatientOrThrow(id);
         return patientMapper.toDto(patient);
     }
 
@@ -51,14 +50,14 @@ public class PatientService {
     }
 
     @Transactional
-    public void deletePatientByEmail(String email) {
-        Patient patient = findPatientOrThrow(email);
+    public void deletePatient(Long id) {
+        Patient patient = findPatientOrThrow(id);
         patientRepository.delete(patient);
     }
 
     @Transactional
-    public PatientDto updatePatientByEmail(String email, UpdatePatientCommand command) {
-        Patient patient = findPatientOrThrow(email);
+    public PatientDto updatePatient(Long id, UpdatePatientCommand command) {
+        Patient patient = findPatientOrThrow(id);
         userService.validateEmailChange(patient.getUser(), command.email());
         patient.update(command);
         patient.getUser().update(command.firstName(), command.lastName(), command.email()
@@ -67,13 +66,13 @@ public class PatientService {
     }
 
     @Transactional
-    public void changePassword(String email, ChangePasswordCommand command) {
-        Patient patient = findPatientOrThrow(email);
+    public void changePassword(Long id, ChangePasswordCommand command) {
+        Patient patient = findPatientOrThrow(id);
         patient.getUser().changePassword(command.password());
     }
 
-    private Patient findPatientOrThrow(String email) {
-        return patientRepository.findByUserEmail(email)
-                .orElseThrow(() -> new PatientNotFoundException(email));
+    private Patient findPatientOrThrow(Long id) {
+        return patientRepository.findById(id)
+                .orElseThrow(() -> new PatientNotFoundException(id));
     }
 }

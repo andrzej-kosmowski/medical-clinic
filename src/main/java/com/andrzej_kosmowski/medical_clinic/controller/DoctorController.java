@@ -33,15 +33,15 @@ public class DoctorController {
         return doctorService.getAllDoctors();
     }
 
-    @Operation(summary = "Get doctor by email")
+    @Operation(summary = "Get doctor by id")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Doctor found"),
         @ApiResponse(responseCode = "404", description = "Doctor not found",
                 content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @GetMapping("/{email}")
-    public DoctorDto getByEmail(@PathVariable String email) {
-        return doctorService.getDoctorByEmail(email);
+    @GetMapping("/{id}")
+    public DoctorDto getById(@PathVariable Long id) {
+        return doctorService.getDoctorById(id);
     }
 
     @Operation(summary = "Get doctor facilities")
@@ -50,9 +50,9 @@ public class DoctorController {
         @ApiResponse(responseCode = "404", description = "Facilities not found",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @GetMapping("/{email}/facilities")
-    public List<FacilityDto> getFacilities(@PathVariable String email) {
-        return doctorService.getFacilities(email);
+    @GetMapping("/{id}/facilities")
+    public List<FacilityDto> getFacilities(@PathVariable Long id) {
+        return doctorService.getFacilities(id);
     }
 
     @Operation(summary = "Create new doctor")
@@ -77,9 +77,9 @@ public class DoctorController {
         @ApiResponse(responseCode = "400", description = "Invalid doctor data",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @PutMapping("/{email}")
-    public DoctorDto update(@PathVariable String email, @RequestBody UpdateDoctorCommand command) {
-        return doctorService.updateDoctorByEmail(email, command);
+    @PutMapping("/{id}")
+    public DoctorDto update(@PathVariable Long id, @RequestBody UpdateDoctorCommand command) {
+        return doctorService.updateDoctor(id, command);
     }
 
     @Operation(summary = "Delete doctor")
@@ -88,10 +88,10 @@ public class DoctorController {
         @ApiResponse(responseCode = "404", description = "Doctor not found",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @DeleteMapping("/{email}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable String email) {
-        doctorService.deleteDoctorByEmail(email);
+    public void delete(@PathVariable Long id) {
+        doctorService.deleteDoctor(id);
     }
 
     @Operation(summary = "Assign facility to doctor")
@@ -100,12 +100,12 @@ public class DoctorController {
         @ApiResponse(responseCode = "404", description = "Doctor or facility not found",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @PatchMapping("/{email}/facility")
+    @PatchMapping("/{id}/facility")
     public DoctorDto assignFacility(
-            @PathVariable String email,
+            @PathVariable Long id,
             @RequestBody AssignFacilityCommand command
     ) {
-        return doctorService.assignFacility(email, command);
+        return doctorService.assignFacility(id, command);
     }
 
     @Operation(summary = "Remove facility from doctor")
@@ -114,9 +114,9 @@ public class DoctorController {
         @ApiResponse(responseCode = "404", description = "Doctor or facility not found",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @DeleteMapping("/{email}/facility/{facilityName}")
+    @DeleteMapping("/{doctorId}/facility/{facilityId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeFacility(@PathVariable String email, @PathVariable String facilityName) {
-        doctorService.removeFacility(email, facilityName);
+    public void removeFacility(@PathVariable Long doctorId, @PathVariable Long facilityId) {
+        doctorService.removeFacility(doctorId, facilityId);
     }
 }

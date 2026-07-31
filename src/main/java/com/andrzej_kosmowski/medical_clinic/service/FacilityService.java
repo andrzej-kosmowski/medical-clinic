@@ -31,13 +31,13 @@ public class FacilityService {
                 .toList();
     }
 
-    public FacilityDto getFacilityByName(String name) {
-        Facility facility = findFacilityOrThrow(name);
+    public FacilityDto getFacilityById(Long id) {
+        Facility facility = findFacilityOrThrow(id);
         return facilityMapper.toDto(facility);
     }
 
-    public List<DoctorDto> getDoctors(String facilityName) {
-        Facility facility = findFacilityOrThrow(facilityName);
+    public List<DoctorDto> getDoctors(Long id) {
+        Facility facility = findFacilityOrThrow(id);
         return facility.getDoctors().stream()
                 .map(doctorMapper::toDto)
                 .toList();
@@ -55,8 +55,8 @@ public class FacilityService {
     }
 
     @Transactional
-    public FacilityDto updateFacility(String name,UpdateFacilityCommand command) {
-        Facility facility = findFacilityOrThrow(name);
+    public FacilityDto updateFacility(Long id,UpdateFacilityCommand command) {
+        Facility facility = findFacilityOrThrow(id);
         if (!facility.getName().equals(command.name())
                 && facilityRepository.existsByName(command.name())) {
             throw new FacilityAlreadyExistsException(command.name());
@@ -66,38 +66,38 @@ public class FacilityService {
     }
 
     @Transactional
-    public void deleteFacilityByName(String name) {
-        Facility facility = findFacilityOrThrow(name);
+    public void deleteFacility(Long id) {
+        Facility facility = findFacilityOrThrow(id);
         facility.getDoctors()
                     .forEach(doctor -> doctor.getFacilities().remove(facility));
         facility.getDoctors().clear();
         facilityRepository.delete(facility);
     }
 
-    public Facility getByName(String name) {
-        return findFacilityOrThrow(name);
+    public Facility getById(Long id) {
+        return findFacilityOrThrow(id);
     }
 
-    public List<Facility> getAllByNames(Set<String> names) {
-        List<Facility> facilities = facilityRepository.findAllByNameIn(names);
-        validateAllFacilitiesFound(names, facilities);
+    public List<Facility> getAllByIds(Set<Long> ids) {
+        List<Facility> facilities = facilityRepository.findAllById(ids);
+        validateFacilitiesExist(ids, facilities);
         return facilities;
     }
 
-    private void validateAllFacilitiesFound(Set<String> requestedNames, List<Facility> facilities) {
-        Set<String> foundNames = facilities.stream()
-                .map(Facility::getName)
+    private void validateFacilitiesExist(Set<Long> requestedIds, List<Facility> facilities) {
+        Set<Long> foundIds = facilities.stream()
+                .map(Facility::getId)
                 .collect(Collectors.toSet());
-        Set<String> missingNames = requestedNames.stream()
-                .filter(name -> !foundNames.contains(name))
+        Set<Long> missingIds = requestedIds.stream()
+                .filter(name -> !foundIds.contains(name))
                 .collect(Collectors.toSet());
-        if (!missingNames.isEmpty()) {
-            throw new FacilityNotFoundException(missingNames);
+        if (!missingIds.isEmpty()) {
+            throw new FacilityNotFoundException(missingIds);
         }
     }
 
-    private Facility findFacilityOrThrow(String name) {
-        return facilityRepository.findByName(name)
-                .orElseThrow(() -> new FacilityNotFoundException(name));
+    private Facility findFacilityOrThrow(Long id) {
+        return facilityRepository.findById(id)
+                .orElseThrow(() -> new FacilityNotFoundException(id));
     }
 }

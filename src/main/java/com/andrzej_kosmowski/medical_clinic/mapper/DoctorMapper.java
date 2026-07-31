@@ -10,6 +10,5 @@ public interface DoctorMapper {
     @Mapping(target = "email", source = "user.email")
     @Mapping(target = "firstName", source = "user.firstName")
     @Mapping(target = "lastName", source = "user.lastName")
-    @Mapping(target = "facilityNames", source = "facilities")
     DoctorDto toDto(Doctor doctor);
 }

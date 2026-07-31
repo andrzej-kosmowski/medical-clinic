@@ -32,15 +32,15 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @Operation(summary = "Get user by email")
+    @Operation(summary = "Get user by id")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "User found"),
         @ApiResponse(responseCode = "404", description = "User not found",
                 content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @GetMapping("/{email}")
-    public UserDto getByEmail(@PathVariable String email) {
-        return userService.getUserByEmail(email);
+    @GetMapping("/{id}")
+    public UserDto getById(@PathVariable Long id) {
+        return userService.getUserById(id);
     }
 
     @Operation(summary = "Create a new user")
@@ -65,9 +65,9 @@ public class UserController {
         @ApiResponse(responseCode = "404", description = "User not found",
                 content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @PutMapping("/{email}")
-    public UserDto update(@PathVariable String email, @RequestBody UpdateUserCommand command) {
-        return userService.updateUser(email, command);
+    @PutMapping("/{id}")
+    public UserDto update(@PathVariable Long id, @RequestBody UpdateUserCommand command) {
+        return userService.updateUser(id, command);
     }
 
     @Operation(summary = "Delete user")
@@ -76,10 +76,10 @@ public class UserController {
         @ApiResponse(responseCode = "404", description = "User not found",
                 content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @DeleteMapping("/{email}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable String email) {
-        userService.deleteUser(email);
+    public void delete(@PathVariable Long id) {
+        userService.deleteUser(id);
     }
 
     @Operation(summary = "Change user password")
@@ -90,9 +90,9 @@ public class UserController {
         @ApiResponse(responseCode = "404", description = "User not found",
                 content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @PatchMapping("/{email}/password")
+    @PatchMapping("/{id}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changePassword(@PathVariable String email, @RequestBody ChangePasswordCommand password) {
-        userService.changePassword(email, password);
+    public void changePassword(@PathVariable Long id, @RequestBody ChangePasswordCommand password) {
+        userService.changePassword(id, password);
     }
 }

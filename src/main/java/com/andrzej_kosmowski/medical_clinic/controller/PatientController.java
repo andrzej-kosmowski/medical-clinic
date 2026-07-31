@@ -32,15 +32,15 @@ public class PatientController {
         return patientService.getAllPatients();
     }
 
-    @Operation(summary = "Get patient by email")
+    @Operation(summary = "Get patient by id")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Patient found"),
         @ApiResponse(responseCode = "404", description = "Patient not found",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @GetMapping("/{email}")
-    public PatientDto getPatient(@PathVariable String email) {
-        return patientService.getPatientByEmail(email);
+    @GetMapping("/{id}")
+    public PatientDto getPatient(@PathVariable Long id) {
+        return patientService.getPatientById(id);
     }
 
     @Operation(summary = "Create a new patient")
@@ -63,10 +63,10 @@ public class PatientController {
         @ApiResponse(responseCode = "404", description = "Patient not found",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @DeleteMapping("/{email}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePatientByEmail(@PathVariable String email) {
-        patientService.deletePatientByEmail(email);
+    public void deletePatient(@PathVariable Long id) {
+        patientService.deletePatient(id);
     }
 
     @Operation(summary = "Update patient")
@@ -77,9 +77,9 @@ public class PatientController {
         @ApiResponse(responseCode = "404", description = "Patient not found",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @PutMapping("/{email}")
-    public PatientDto updatePatientByEmail(@PathVariable String email, @RequestBody UpdatePatientCommand patient) {
-        return patientService.updatePatientByEmail(email, patient);
+    @PutMapping("/{id}")
+    public PatientDto updatePatient(@PathVariable Long id, @RequestBody UpdatePatientCommand patient) {
+        return patientService.updatePatient(id, patient);
     }
 
     @Operation(summary = "Change patient password")
@@ -90,9 +90,9 @@ public class PatientController {
         @ApiResponse(responseCode = "404", description = "Patient not found",
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
-    @PatchMapping("/{email}/password")
+    @PatchMapping("/{id}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changePatientPassword(@PathVariable String email, @RequestBody ChangePasswordCommand password) {
-        patientService.changePassword(email, password);
+    public void changePatientPassword(@PathVariable Long id, @RequestBody ChangePasswordCommand password) {
+        patientService.changePassword(id, password);
     }
 }

@@ -1,5 +1,7 @@
 package com.andrzej_kosmowski.medical_clinic.dto.doctor;
 
+import com.andrzej_kosmowski.medical_clinic.dto.facility.FacilityShortDto;
+
 import java.util.Set;
 
 public record DoctorDto(
@@ -8,6 +10,6 @@ public record DoctorDto(
         String firstName,
         String lastName,
         String specialization,
-        Set<String> facilityNames
+        Set<FacilityShortDto> facilities
 ) {
 }

@@ -27,8 +27,8 @@ public class UserService {
                 .toList();
     }
 
-    public UserDto getUserByEmail(String email) {
-        User user = findUserOrThrow(email);
+    public UserDto getUserById(Long id) {
+        User user = findUserOrThrow(id);
         return userMapper.toDto(user);
     }
 
@@ -47,33 +47,33 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto updateUser(String email,UpdateUserCommand command) {
-        User user = findUserOrThrow(email);
+    public UserDto updateUser(Long id,UpdateUserCommand command) {
+        User user = findUserOrThrow(id);
         this.validateEmailChange(user, command.email());
         user.update(command.firstName(), command.lastName(), command.email());
         return userMapper.toDto(user);
     }
 
     @Transactional
-    public void deleteUser(String email) {
-        User user = findUserOrThrow(email);
+    public void deleteUser(Long id) {
+        User user = findUserOrThrow(id);
         userRepository.delete(user);
     }
 
     @Transactional
-    public void changePassword(String email, ChangePasswordCommand command) {
-        User user = findUserOrThrow(email);
+    public void changePassword(Long id, ChangePasswordCommand command) {
+        User user = findUserOrThrow(id);
         user.changePassword(command.password());
     }
 
     public void validateEmailChange(User user, String newEmail) {
-        if (!user.getEmail().equals(newEmail) && userRepository.existsByEmail(newEmail)) {
+        if (userRepository.existsByEmailAndIdNot(newEmail, user.getId())) {
             throw new UserAlreadyExistsException(newEmail);
         }
     }
 
-    private User findUserOrThrow(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(email));
+    private User findUserOrThrow(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 }
