@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -74,6 +76,24 @@ public class FacilityService {
 
     public Facility getByName(String name) {
         return findFacilityOrThrow(name);
+    }
+
+    public List<Facility> getAllByNames(Set<String> names) {
+        List<Facility> facilities = facilityRepository.findAllByNameIn(names);
+        validateAllFacilitiesFound(names, facilities);
+        return facilities;
+    }
+
+    private void validateAllFacilitiesFound(Set<String> requestedNames, List<Facility> facilities) {
+        Set<String> foundNames = facilities.stream()
+                .map(Facility::getName)
+                .collect(Collectors.toSet());
+        Set<String> missingNames = requestedNames.stream()
+                .filter(name -> !foundNames.contains(name))
+                .collect(Collectors.toSet());
+        if (!missingNames.isEmpty()) {
+            throw new FacilityNotFoundException(missingNames);
+        }
     }
 
     private Facility findFacilityOrThrow(String name) {

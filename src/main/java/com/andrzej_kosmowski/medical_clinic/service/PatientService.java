@@ -8,6 +8,7 @@ import com.andrzej_kosmowski.medical_clinic.dto.user.CreateUserCommand;
 import com.andrzej_kosmowski.medical_clinic.exception.patient.PatientAlreadyExistsException;
 import com.andrzej_kosmowski.medical_clinic.exception.patient.PatientNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.mapper.PatientMapper;
+import com.andrzej_kosmowski.medical_clinic.mapper.UserMapper;
 import com.andrzej_kosmowski.medical_clinic.model.Patient;
 import com.andrzej_kosmowski.medical_clinic.model.User;
 import com.andrzej_kosmowski.medical_clinic.repository.PatientRepository;
@@ -23,6 +24,7 @@ public class PatientService {
     private final PatientRepository patientRepository;
     private final UserService userService;
     private final PatientMapper patientMapper;
+    private final UserMapper userMapper;
 
     public List<PatientDto> getAllPatients() {
         return patientRepository.findAll().stream()
@@ -42,13 +44,7 @@ public class PatientService {
         }
         Patient patient = patientMapper.from(command);
         patient.validate();
-        CreateUserCommand userCommand = new CreateUserCommand(
-                command.firstName(),
-                command.lastName(),
-                command.email(),
-                command.password()
-        );
-        User user = userService.createUser(userCommand);
+        User user = userService.createUser(userMapper.toUserCommand(command));
         patient.assignUser(user);
         Patient saved = patientRepository.save(patient);
         return patientMapper.toDto(saved);
@@ -63,14 +59,9 @@ public class PatientService {
     @Transactional
     public PatientDto updatePatientByEmail(String email, UpdatePatientCommand command) {
         Patient patient = findPatientOrThrow(email);
-        userService.validateEmailChange(
-                patient.getUser(),
-                command.email());
+        userService.validateEmailChange(patient.getUser(), command.email());
         patient.update(command);
-        patient.getUser().update(
-                command.firstName(),
-                command.lastName(),
-                command.email()
+        patient.getUser().update(command.firstName(), command.lastName(), command.email()
         );
         return patientMapper.toDto(patient);
     }

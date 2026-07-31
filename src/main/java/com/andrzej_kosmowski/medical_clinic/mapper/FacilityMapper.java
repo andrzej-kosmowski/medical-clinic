@@ -8,6 +8,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface FacilityMapper {
     Facility from(CreateFacilityCommand command);
+
     FacilityDto toDto(Facility facility);
 
     default String toName(Facility facility) {

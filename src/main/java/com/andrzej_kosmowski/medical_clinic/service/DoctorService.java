@@ -9,6 +9,7 @@ import com.andrzej_kosmowski.medical_clinic.dto.facility.FacilityDto;
 import com.andrzej_kosmowski.medical_clinic.exception.doctor.DoctorNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.mapper.DoctorMapper;
 import com.andrzej_kosmowski.medical_clinic.mapper.FacilityMapper;
+import com.andrzej_kosmowski.medical_clinic.mapper.UserMapper;
 import com.andrzej_kosmowski.medical_clinic.model.Doctor;
 import com.andrzej_kosmowski.medical_clinic.model.Facility;
 import com.andrzej_kosmowski.medical_clinic.model.User;
@@ -27,6 +28,7 @@ public class DoctorService {
     private final DoctorRepository doctorRepository;
     private final DoctorMapper doctorMapper;
     private final FacilityMapper facilityMapper;
+    private final UserMapper userMapper;
     private final UserService userService;
     private final FacilityService facilityService;
 
@@ -50,37 +52,22 @@ public class DoctorService {
 
     @Transactional
     public DoctorDto addDoctor(CreateDoctorCommand command) {
-        CreateUserCommand userCommand = new CreateUserCommand(
-                command.firstName(),
-                command.lastName(),
-                command.email(),
-                command.password()
-        );
-        User user = userService.createUser(userCommand);
-        Doctor doctor = new Doctor(command.specialization());
-        doctor.assignUser(user);
-        doctor.validate();
+        User user = userService.createUser(userMapper.toUserCommand(command));
+        Doctor doctor = Doctor.create(command.specialization(), user);
         Doctor saved  = doctorRepository.save(doctor);
-        Optional.ofNullable(command.facilityNames())
-                .orElse(Set.of())
-                .forEach(name -> {
-                    Facility facility = facilityService.getByName(name);
-                    doctor.assignFacility(facility);
-                });
+        Set<String> facilityNames = Optional.ofNullable(command.facilityNames())
+                .orElse(Set.of());
+        List<Facility> facilities = facilityService.getAllByNames(facilityNames);
+        facilities.forEach(doctor::assignFacility);
         return doctorMapper.toDto(saved);
     }
 
     @Transactional
     public DoctorDto updateDoctorByEmail(String email, UpdateDoctorCommand command) {
         Doctor doctor = findDoctorOrThrow(email);
-        userService.validateEmailChange(
-                doctor.getUser(),
-                command.email());
+        userService.validateEmailChange(doctor.getUser(), command.email());
         doctor.updateSpecialization(command.specialization());
-        doctor.getUser().update(
-                command.firstName(),
-                command.lastName(),
-                command.email()
+        doctor.getUser().update(command.firstName(), command.lastName(), command.email()
         );
         return doctorMapper.toDto(doctor);
     }

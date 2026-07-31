@@ -17,14 +17,11 @@ public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(nullable = false)
     private String specialization;
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
-
     @ManyToMany
     @JoinTable(
             name = "doctor_facilities",
@@ -35,6 +32,13 @@ public class Doctor {
 
     public Doctor(String specialization) {
         this.specialization = specialization;
+    }
+
+    public static Doctor create(String specialization, User user) {
+        Doctor doctor = new Doctor(specialization);
+        doctor.assignUser(user);
+        doctor.validate();
+        return doctor;
     }
 
     public void updateSpecialization(String specialization) {

@@ -29,7 +29,6 @@ public class UserService {
 
     public UserDto getUserByEmail(String email) {
         User user = findUserOrThrow(email);
-
         return userMapper.toDto(user);
     }
 
