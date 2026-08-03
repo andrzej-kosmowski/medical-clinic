@@ -38,6 +38,16 @@ public class Patient {
         user.assignPatient(this);
     }
 
+    public void addVisit(Visit visit) {
+        if (!visits.contains(visit)) {
+            visits.add(visit);
+        }
+    }
+
+    public void removeVisit(Visit visit) {
+        visits.remove(visit);
+    }
+
     public void validate() {
         if (idCardNo == null || idCardNo.isBlank()) {
             throw new InvalidPatientDataException("idCardNo cannot be empty");

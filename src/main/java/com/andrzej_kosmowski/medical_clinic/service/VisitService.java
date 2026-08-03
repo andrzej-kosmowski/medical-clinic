@@ -49,13 +49,15 @@ public class VisitService {
     }
 
     public List<VisitDto> getPatientVisits(long patientId) {
-        return visitRepository.findAllByPatientId(patientId).stream()
+        Patient patient = findPatientOrThrow(patientId);
+        return patient.getVisits().stream()
                 .map(visitMapper::toDto)
                 .toList();
     }
 
     public List<VisitDto> getDoctorVisits(long doctorId) {
-        return visitRepository.findAllByDoctorId(doctorId).stream()
+        Doctor doctor = findDoctorOrThrow(doctorId);
+        return doctor.getVisits().stream()
                 .map(visitMapper::toDto)
                 .toList();
     }

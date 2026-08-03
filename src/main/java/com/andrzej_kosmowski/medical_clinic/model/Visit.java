@@ -37,6 +37,7 @@ public class Visit {
 
     public void assignDoctor(Doctor doctor) {
         this.doctor = doctor;
+        doctor.addVisit(this);
     }
 
     public void assignPatient(Patient patient) {
@@ -47,6 +48,7 @@ public class Visit {
             throw new PastVisitException(startTime);
         }
         this.patient = patient;
+        patient.addVisit(this);
     }
 
     public boolean isAvailable() {
@@ -57,6 +59,7 @@ public class Visit {
         if (patient == null) {
             throw new InvalidVisitDataException("Visit has no patient");
         }
+        patient.removeVisit(this);
         this.patient = null;
     }
 

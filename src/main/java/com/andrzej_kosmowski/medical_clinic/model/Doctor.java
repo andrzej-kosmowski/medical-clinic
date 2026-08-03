@@ -67,6 +67,12 @@ public class Doctor {
         }
     }
 
+    public void addVisit(Visit visit) {
+        if (!visits.contains(visit)) {
+            visits.add(visit);
+        }
+    }
+
     public void removeFacility(Facility facility) {
         if (facilities.remove(facility)) {
             facility.removeDoctor(this);
