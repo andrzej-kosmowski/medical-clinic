@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface VisitRepository extends JpaRepository<Visit, Long> {
-    List<Visit> findAllByPatientIsNull();
+    List<Visit> findAllByPatientIsNullAndStartTimeAfter(LocalDateTime startTime);
     boolean existsByDoctorIdAndStartTimeLessThanAndEndTimeGreaterThan(
             Long id, LocalDateTime end, LocalDateTime start
     );

@@ -42,8 +42,8 @@ public class VisitService {
     }
 
     public List<VisitDto> getAvailableVisits() {
-        return visitRepository.findAllByPatientIsNull().stream()
-                .filter(visit -> visit.getStartTime().isAfter(LocalDateTime.now()))
+        return visitRepository.findAllByPatientIsNullAndStartTimeAfter(LocalDateTime.now())
+                .stream()
                 .map(visitMapper::toDto)
                 .toList();
     }
