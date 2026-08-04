@@ -31,7 +31,7 @@ public class Doctor {
             inverseJoinColumns = @JoinColumn(name = "facility_id")
     )
     private Set<Facility> facilities = new HashSet<>();
-    @OneToMany(mappedBy = "doctor")
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)
     private List<Visit> visits = new ArrayList<>();
 
     public Doctor(String specialization) {
@@ -68,7 +68,7 @@ public class Doctor {
     }
 
     public void addVisit(Visit visit) {
-        if (!visits.contains(visit)) {
+        if (visits.contains(visit)) {
             visits.add(visit);
         }
     }
