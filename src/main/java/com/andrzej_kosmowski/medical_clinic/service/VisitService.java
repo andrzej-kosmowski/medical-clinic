@@ -17,6 +17,8 @@ import com.andrzej_kosmowski.medical_clinic.repository.PatientRepository;
 import com.andrzej_kosmowski.medical_clinic.repository.VisitRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,10 +32,9 @@ public class VisitService {
     private final PatientRepository patientRepository;
     private final VisitMapper visitMapper;
 
-    public List<VisitDto> getAllVisits() {
-        return visitRepository.findAll().stream()
-                .map(visitMapper::toDto)
-                .toList();
+    public Page<VisitDto> getAllVisits(Pageable pageable) {
+        return visitRepository.findAll(pageable)
+                .map(visitMapper::toDto);
     }
 
     public VisitDto getVisitById(long id) {

@@ -13,6 +13,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,8 +30,8 @@ public class UserController {
     @Operation(summary = "Get all users")
     @ApiResponse(responseCode = "200", description = "List of users returned successfully")
     @GetMapping
-    public List<UserDto> getAll() {
-        return userService.getAllUsers();
+    public Page<UserDto> getAll(Pageable pageable) {
+        return userService.getAllUsers(pageable);
     }
 
     @Operation(summary = "Get user by id")

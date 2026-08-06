@@ -12,6 +12,8 @@ import com.andrzej_kosmowski.medical_clinic.model.Facility;
 import com.andrzej_kosmowski.medical_clinic.repository.FacilityRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,10 +27,9 @@ public class FacilityService {
     private final FacilityMapper facilityMapper;
     private final DoctorMapper doctorMapper;
 
-    public List<FacilityDto> getAllFacilities() {
-        return facilityRepository.findAll().stream()
-                .map(facilityMapper::toDto)
-                .toList();
+    public Page<FacilityDto> getAllFacilities(Pageable pageable) {
+        return facilityRepository.findAll(pageable)
+                .map(facilityMapper::toDto);
     }
 
     public FacilityDto getFacilityById(Long id) {

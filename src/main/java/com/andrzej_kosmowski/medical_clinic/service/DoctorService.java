@@ -15,6 +15,8 @@ import com.andrzej_kosmowski.medical_clinic.model.User;
 import com.andrzej_kosmowski.medical_clinic.repository.DoctorRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,10 +33,9 @@ public class DoctorService {
     private final UserService userService;
     private final FacilityService facilityService;
 
-    public List<DoctorDto> getAllDoctors() {
-        return doctorRepository.findAll().stream()
-                .map(doctorMapper::toDto)
-                .toList();
+    public Page<DoctorDto> getAllDoctors(Pageable pageable) {
+        return doctorRepository.findAll(pageable)
+                .map(doctorMapper::toDto);
     }
 
     public DoctorDto getDoctorById(Long id) {

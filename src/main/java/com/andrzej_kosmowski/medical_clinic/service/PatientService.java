@@ -13,6 +13,8 @@ import com.andrzej_kosmowski.medical_clinic.model.User;
 import com.andrzej_kosmowski.medical_clinic.repository.PatientRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,10 +27,9 @@ public class PatientService {
     private final PatientMapper patientMapper;
     private final UserMapper userMapper;
 
-    public List<PatientDto> getAllPatients() {
-        return patientRepository.findAll().stream()
-                .map(patientMapper::toDto)
-                .toList();
+    public Page<PatientDto> getAllPatients(Pageable pageable) {
+        return patientRepository.findAll(pageable)
+                .map(patientMapper::toDto);
     }
 
     public PatientDto getPatientById(Long id) {
