@@ -18,9 +18,7 @@ import com.andrzej_kosmowski.medical_clinic.repository.PatientRepository;
 import com.andrzej_kosmowski.medical_clinic.repository.VisitRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
