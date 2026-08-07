@@ -1,5 +1,6 @@
 package com.andrzej_kosmowski.medical_clinic.service;
 
+import com.andrzej_kosmowski.medical_clinic.dto.PageResponse;
 import com.andrzej_kosmowski.medical_clinic.dto.patient.CreatePatientCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.patient.PatientDto;
 import com.andrzej_kosmowski.medical_clinic.dto.patient.UpdatePatientCommand;
@@ -25,9 +26,9 @@ public class PatientService {
     private final PatientMapper patientMapper;
     private final UserMapper userMapper;
 
-    public Page<PatientDto> getAllPatients(Pageable pageable) {
-        return patientRepository.findAll(pageable)
-                .map(patientMapper::toDto);
+    public PageResponse<PatientDto> getAllPatients(Pageable pageable) {
+        return PageResponse.from(patientRepository.findAll(pageable)
+                .map(patientMapper::toDto));
     }
 
     public PatientDto getPatientById(Long id) {

@@ -1,5 +1,6 @@
 package com.andrzej_kosmowski.medical_clinic.service;
 
+import com.andrzej_kosmowski.medical_clinic.dto.PageResponse;
 import com.andrzej_kosmowski.medical_clinic.dto.user.ChangePasswordCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.user.CreateUserCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.user.UpdateUserCommand;
@@ -21,9 +22,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public Page<UserDto> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable)
-                .map(userMapper::toDto);
+    public PageResponse<UserDto> getAllUsers(Pageable pageable) {
+        return PageResponse.from(userRepository.findAll(pageable)
+                .map(userMapper::toDto));
     }
 
     public UserDto getUserById(Long id) {

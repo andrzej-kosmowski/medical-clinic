@@ -1,5 +1,6 @@
 package com.andrzej_kosmowski.medical_clinic.service;
 
+import com.andrzej_kosmowski.medical_clinic.dto.PageResponse;
 import com.andrzej_kosmowski.medical_clinic.dto.visit.CreateVisitCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.visit.VisitDto;
 import com.andrzej_kosmowski.medical_clinic.exception.doctor.DoctorNotFoundException;
@@ -19,6 +20,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -32,9 +34,9 @@ public class VisitService {
     private final PatientRepository patientRepository;
     private final VisitMapper visitMapper;
 
-    public Page<VisitDto> getAllVisits(Pageable pageable) {
-        return visitRepository.findAll(pageable)
-                .map(visitMapper::toDto);
+    public PageResponse<VisitDto> getAllVisits(Pageable pageable) {
+        return PageResponse.from(visitRepository.findAll(pageable)
+                .map(visitMapper::toDto));
     }
 
     public VisitDto getVisitById(long id) {

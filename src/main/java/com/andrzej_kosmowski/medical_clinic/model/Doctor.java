@@ -68,7 +68,7 @@ public class Doctor {
     }
 
     public void addVisit(Visit visit) {
-        if (visits.contains(visit)) {
+        if (!visits.contains(visit)) {
             visits.add(visit);
         }
     }

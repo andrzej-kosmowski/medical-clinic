@@ -1,6 +1,7 @@
 package com.andrzej_kosmowski.medical_clinic.controller;
 
 import com.andrzej_kosmowski.medical_clinic.dto.ErrorMessageDto;
+import com.andrzej_kosmowski.medical_clinic.dto.PageResponse;
 import com.andrzej_kosmowski.medical_clinic.dto.visit.CreateVisitCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.visit.VisitDto;
 import com.andrzej_kosmowski.medical_clinic.service.VisitService;
@@ -11,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +28,7 @@ public class VisitController {
     @Operation(summary = "Get all visits")
     @ApiResponse(responseCode = "200", description = "List of visits returned successfully")
     @GetMapping
-    public Page<VisitDto> getAll(Pageable pageable) {
+    public PageResponse<VisitDto> getAll(Pageable pageable) {
         return visitService.getAllVisits(pageable);
     }
 

@@ -1,5 +1,6 @@
 package com.andrzej_kosmowski.medical_clinic.service;
 
+import com.andrzej_kosmowski.medical_clinic.dto.PageResponse;
 import com.andrzej_kosmowski.medical_clinic.dto.doctor.DoctorDto;
 import com.andrzej_kosmowski.medical_clinic.dto.facility.CreateFacilityCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.facility.FacilityDto;
@@ -27,9 +28,9 @@ public class FacilityService {
     private final FacilityMapper facilityMapper;
     private final DoctorMapper doctorMapper;
 
-    public Page<FacilityDto> getAllFacilities(Pageable pageable) {
-        return facilityRepository.findAll(pageable)
-                .map(facilityMapper::toDto);
+    public PageResponse<FacilityDto> getAllFacilities(Pageable pageable) {
+        return PageResponse.from(facilityRepository.findAll(pageable)
+                .map(facilityMapper::toDto));
     }
 
     public FacilityDto getFacilityById(Long id) {
