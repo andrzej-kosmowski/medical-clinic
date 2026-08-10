@@ -66,4 +66,16 @@ public class Patient {
         this.idCardNo = command.idCardNo();
         this.validate();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Patient patient)) return false;
+        return id != null && id.equals(patient.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

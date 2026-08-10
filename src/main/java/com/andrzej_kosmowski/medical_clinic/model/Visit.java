@@ -83,7 +83,20 @@ public class Visit {
             throw new InvalidVisitDataException("End time must be on full quarter hour");
         }
     }
+
     private boolean isFullQuarterHour(LocalDateTime time) {
         return time.getMinute() % 15 == 0 && time.getSecond() == 0 && time.getNano() == 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Visit visit)) return false;
+        return id != null && id.equals(visit.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
