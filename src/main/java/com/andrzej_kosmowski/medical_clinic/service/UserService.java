@@ -12,9 +12,11 @@ import com.andrzej_kosmowski.medical_clinic.model.User;
 import com.andrzej_kosmowski.medical_clinic.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -32,7 +34,10 @@ public class UserService {
     }
 
     public UserDto addUser(CreateUserCommand command) {
-        return userMapper.toDto(createUser(command));
+        log.info("Creating user: email={}", command.email());
+        User user = createUser(command);
+        log.info("User created successfully: id={}, email={}", user.getId(), user.getEmail());
+        return userMapper.toDto(user);
     }
 
     @Transactional
@@ -47,22 +52,28 @@ public class UserService {
 
     @Transactional
     public UserDto updateUser(Long id,UpdateUserCommand command) {
+        log.info("Updating user: id={}, newEmail={}", id, command.email());
         User user = findUserOrThrow(id);
         this.validateEmailChange(user, command.email());
         user.update(command.firstName(), command.lastName(), command.email());
+        log.info("User updated successfully: id={}, email={}", user.getId(), user.getEmail());
         return userMapper.toDto(user);
     }
 
     @Transactional
     public void deleteUser(Long id) {
+        log.info("Deleting user: id={}", id);
         User user = findUserOrThrow(id);
         userRepository.delete(user);
+        log.info("User deleted successfully: id={}, email={}", id, user.getEmail());
     }
 
     @Transactional
     public void changePassword(Long id, ChangePasswordCommand command) {
+        log.info("Changing password for user: id={}", id);
         User user = findUserOrThrow(id);
         user.changePassword(command.password());
+        log.info("Password changed successfully: userId={}", id);
     }
 
     public void validateEmailChange(User user, String newEmail) {

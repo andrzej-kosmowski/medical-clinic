@@ -18,12 +18,14 @@ import com.andrzej_kosmowski.medical_clinic.repository.PatientRepository;
 import com.andrzej_kosmowski.medical_clinic.repository.VisitRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VisitService {
@@ -65,37 +67,47 @@ public class VisitService {
 
     @Transactional
     public VisitDto createVisit(CreateVisitCommand command) {
+        log.info("Creating visit for doctorId={}, startTime={}, endTime={}",
+                command.doctorId(), command.startTime(), command.endTime());
         Doctor doctor = findDoctorOrThrow(command.doctorId());
+        validateDoctorAvailability(command.doctorId(), command.startTime(), command.endTime());
         Visit visit = visitMapper.from(command);
         visit.assignDoctor(doctor);
-        validateDoctorAvailability(command.doctorId(), command.startTime(), command.endTime());
         visit.validate();
         Visit saved = visitRepository.save(visit);
+        log.info("Visit created successfully: visit id={}, doctorId={}, startTime={}, endTime={}",
+                saved.getId(), command.doctorId(), command.startTime(), command.endTime());
         return visitMapper.toDto(saved);
     }
 
     @Transactional
     public VisitDto assignPatient(Long visitId, Long patientId) {
+        log.info("Assigning patientId={} to visitId={}", patientId, visitId);
         Visit visit = findVisitOrThrow(visitId);
         Patient patient = findPatientOrThrow(patientId);
         validatePatientAvailability(patientId, visit.getStartTime(), visit.getEndTime());
         visit.assignPatient(patient);
+        log.info("Patient assigned successfully: patientId={}, visitId={}", patientId, visitId);
         return visitMapper.toDto(visit);
     }
 
     @Transactional
     public void cancelVisit(long visitId) {
+        log.info("Canceling visitId={}", visitId);
         Visit visit = findVisitOrThrow(visitId);
         visit.cancelVisit();
+        log.info("Visit cancelled successfully: visitId={}", visitId);
     }
 
     @Transactional
     public void deleteVisit(long visitId) {
+        log.info("Deleting visitId={}", visitId);
         Visit visit = findVisitOrThrow(visitId);
         if (!visit.isAvailable()) {
             throw new VisitAlreadyBookedException(visitId);
         }
         visitRepository.delete(visit);
+        log.info("Visit deleted successfully: visitId={}", visitId);
     }
 
     private void validateDoctorAvailability(Long doctorId, LocalDateTime startTime, LocalDateTime endTime) {

@@ -16,6 +16,7 @@ import com.andrzej_kosmowski.medical_clinic.model.User;
 import com.andrzej_kosmowski.medical_clinic.repository.DoctorRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DoctorService {
@@ -52,6 +54,7 @@ public class DoctorService {
 
     @Transactional
     public DoctorDto addDoctor(CreateDoctorCommand command) {
+        log.info("Creating doctor: specialization={}, email={}", command.specialization(), command.email());
         User user = userService.createUser(userMapper.toUserCommand(command));
         Doctor doctor = Doctor.create(command.specialization(), user);
         Doctor saved  = doctorRepository.save(doctor);
@@ -59,22 +62,29 @@ public class DoctorService {
                 .orElse(Set.of());
         List<Facility> facilities = facilityService.getAllByIds(facilityIds);
         facilities.forEach(doctor::assignFacility);
+        log.info("Doctor created successfully: doctorId={}, specialization={}, facilitiesCount={}",
+                saved.getId(), saved.getSpecialization(), facilities.size());
         return doctorMapper.toDto(saved);
     }
 
     @Transactional
     public DoctorDto updateDoctor(Long id, UpdateDoctorCommand command) {
         Doctor doctor = findDoctorOrThrow(id);
+        log.info("Updating doctor: doctorId={}, specialization={}", id, doctor.getSpecialization());
         userService.validateEmailChange(doctor.getUser(), command.email());
         doctor.updateSpecialization(command.specialization());
         doctor.getUser().update(command.firstName(), command.lastName(), command.email());
+        log.info("Doctor updated successfully: doctorId={}", id);
         return doctorMapper.toDto(doctor);
     }
 
     @Transactional
     public void deleteDoctor(Long id) {
         Doctor doctor = findDoctorOrThrow(id);
+        log.info("Deleting doctor: doctorId={}, specialization={}", doctor.getId(), doctor.getSpecialization());
         doctorRepository.delete(doctor);
+        log.info("Doctor deleted successfully: doctorId={}", id);
+
     }
 
     @Transactional
@@ -82,6 +92,7 @@ public class DoctorService {
         Doctor doctor = findDoctorOrThrow(id);
         Facility facility = facilityService.getById(command.facilityId());
         doctor.assignFacility(facility);
+        log.info("Facility assigned to doctor: doctorId={}, facilityId={}", id, command.facilityId());
         return doctorMapper.toDto(doctor);
     }
 
@@ -90,6 +101,7 @@ public class DoctorService {
         Doctor doctor = findDoctorOrThrow(doctorId);
         Facility facility = facilityService.getById(facilityId);
         doctor.removeFacility(facility);
+        log.info("Facility removed from doctor: doctorId={}, facilityId={}", doctorId, facilityId);
     }
 
     private Doctor findDoctorOrThrow(Long id) {
