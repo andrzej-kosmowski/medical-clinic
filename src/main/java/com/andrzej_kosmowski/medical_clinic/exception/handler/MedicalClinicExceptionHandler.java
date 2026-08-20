@@ -17,7 +17,7 @@ public class MedicalClinicExceptionHandler {
     public ResponseEntity<ErrorMessageDto> handleMedicalClinicException(
             MedicalClinicException exception
     ) {
-        log.warn("Business exception: status={}, message={}", exception.getStatus(), exception.getMessage());
+        log.error("Business exception: status={}, message={}", exception.getStatus(), exception.getMessage());
         HttpStatus status = exception.getStatus();
         ErrorMessageDto error = new ErrorMessageDto(
                 LocalDateTime.now(),

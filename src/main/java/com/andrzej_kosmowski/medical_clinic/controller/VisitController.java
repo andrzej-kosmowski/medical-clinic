@@ -12,12 +12,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/visits", produces = "application/json")
 @RequiredArgsConstructor
@@ -85,7 +87,10 @@ public class VisitController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public VisitDto create(@RequestBody CreateVisitCommand command) {
-        return visitService.createVisit(command);
+        log.info("Creating visit");
+        VisitDto visit = visitService.createVisit(command);
+        log.info("Visit created successfully with id={}", visit.id());
+        return visit;
     }
 
     @Operation(summary = "Assign patient to visit")
@@ -100,7 +105,10 @@ public class VisitController {
     })
     @PatchMapping("/{visitId}/patient/{patientId}")
     public VisitDto assignPatient(@PathVariable Long visitId, @PathVariable Long patientId) {
-        return visitService.assignPatient(visitId, patientId);
+        log.info("Assigning patient to visit");
+        VisitDto visit = visitService.assignPatient(visitId, patientId);
+        log.info("Visit={} assigned successfully to patient={}", visitId, patientId);
+        return visit;
     }
 
     @Operation(summary = "Cancel patient visit")
@@ -112,7 +120,9 @@ public class VisitController {
     @PatchMapping("/{visitId}/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancel(@PathVariable Long visitId) {
+        log.info("Canceling visit {}", visitId);
         visitService.cancelVisit(visitId);
+        log.info("Visit cancelled successfully");
     }
 
     @Operation(summary = "Doctor deletes an unbooked visit slot")
@@ -126,7 +136,9 @@ public class VisitController {
     @DeleteMapping("/{visitId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long visitId) {
+        log.info("Deleting visit {}", visitId);
         visitService.deleteVisit(visitId);
+        log.info("Visit deleted successfully");
     }
 
 }
