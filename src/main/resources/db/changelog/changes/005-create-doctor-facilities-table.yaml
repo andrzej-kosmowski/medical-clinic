@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-create-doctor-facilities-table
+      author: Andrzej
+      changes:
+        - createTable:
+            tableName: doctor_facilities
+            columns:
+              - column:
+                  name: doctor_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: facility_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: doctor_facilities
+            columnNames: doctor_id, facility_id
+            constraintName: pk_doctor_facilities
+        - addForeignKeyConstraint:
+            baseTableName: doctor_facilities
+            baseColumnNames: doctor_id
+            referencedTableName: doctors
+            referencedColumnNames: id
+            constraintName: fk_doctor_facilities_doctor
+        - addForeignKeyConstraint:
+            baseTableName: doctor_facilities
+            baseColumnNames: facility_id
+            referencedTableName: facilities
+            referencedColumnNames: id
+            constraintName: fk_doctor_facilities_facility
