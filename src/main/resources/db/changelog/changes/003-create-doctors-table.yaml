@@ -24,9 +24,5 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     unique: true
-        - addForeignKeyConstraint:
-            baseTableName: doctors
-            baseColumnNames: user_id
-            referencedTableName: users
-            referencedColumnNames: id
-            constraintName: fk_doctors_users
+                    foreignKeyName: fk_doctors_users
+                    references: users(id)
