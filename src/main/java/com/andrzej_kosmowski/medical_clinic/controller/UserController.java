@@ -13,11 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@Slf4j
 @RestController
 @RequestMapping(value = "/users", produces = "application/json")
 @RequiredArgsConstructor
@@ -28,8 +29,8 @@ public class UserController {
     @Operation(summary = "Get all users")
     @ApiResponse(responseCode = "200", description = "List of users returned successfully")
     @GetMapping
-    public List<UserDto> getAll() {
-        return userService.getAllUsers();
+    public PageResponse<UserDto> getAll(Pageable pageable) {
+        return userService.getAllUsers(pageable);
     }
 
     @Operation(summary = "Get user by id")
@@ -54,7 +55,10 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto create(@RequestBody CreateUserCommand command) {
-        return userService.addUser(command);
+        log.info("Creating user {}", command.email());
+        UserDto user = userService.addUser(command);
+        log.info("Created user={} with id={}", user.email(), user.id());
+        return user;
     }
 
     @Operation(summary = "Update user")
@@ -67,7 +71,10 @@ public class UserController {
     })
     @PutMapping("/{id}")
     public UserDto update(@PathVariable Long id, @RequestBody UpdateUserCommand command) {
-        return userService.updateUser(id, command);
+        log.info("Updating user {}", id);
+        UserDto user = userService.updateUser(id, command);
+        log.info("Updated user={} with id={}", user.email(), user.id());
+        return user;
     }
 
     @Operation(summary = "Delete user")
@@ -79,7 +86,9 @@ public class UserController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
+        log.info("Deleting user {}", id);
         userService.deleteUser(id);
+        log.info("User deleted successfully with id={}", id);
     }
 
     @Operation(summary = "Change user password")

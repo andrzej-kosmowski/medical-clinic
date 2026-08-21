@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "patients")
@@ -22,6 +24,8 @@ public class Patient {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+    @OneToMany(mappedBy = "patient")
+    private List<Visit> visits = new ArrayList<>();
 
     public Patient(String idCardNo, String phoneNumber, LocalDate birthday) {
         this.idCardNo = idCardNo;
@@ -32,6 +36,16 @@ public class Patient {
     public void assignUser(User user) {
         this.user = user;
         user.assignPatient(this);
+    }
+
+    public void addVisit(Visit visit) {
+        if (!visits.contains(visit)) {
+            visits.add(visit);
+        }
+    }
+
+    public void removeVisit(Visit visit) {
+        visits.remove(visit);
     }
 
     public void validate() {
@@ -51,5 +65,17 @@ public class Patient {
         this.birthday = command.birthday();
         this.idCardNo = command.idCardNo();
         this.validate();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Patient patient)) return false;
+        return id != null && id.equals(patient.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

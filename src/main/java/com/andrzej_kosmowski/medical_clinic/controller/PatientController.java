@@ -13,11 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@Slf4j
 @RestController
 @RequestMapping(value = "/patients", produces = "application/json")
 @RequiredArgsConstructor
@@ -28,8 +29,8 @@ public class PatientController {
     @Operation(summary = "Get all patients")
     @ApiResponse(responseCode = "200", description = "List of patients returned successfully")
     @GetMapping
-    public List<PatientDto> getAll() {
-        return patientService.getAllPatients();
+    public PageResponse<PatientDto> getAll(Pageable pageable) {
+        return patientService.getAllPatients(pageable);
     }
 
     @Operation(summary = "Get patient by id")
@@ -53,8 +54,11 @@ public class PatientController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PatientDto addPatient(@RequestBody CreatePatientCommand patient) {
-        return patientService.addPatient(patient);
+    public PatientDto addPatient(@RequestBody CreatePatientCommand command) {
+        log.info("Adding new patient={}", command.email());
+        PatientDto patient = patientService.addPatient(command);
+        log.info("New patient={} added with id={}", patient.email(), patient.idCardNo());
+        return patient;
     }
 
     @Operation(summary = "Delete patient")
@@ -66,7 +70,9 @@ public class PatientController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePatient(@PathVariable Long id) {
+        log.info("Deleting patient={}", id);
         patientService.deletePatient(id);
+        log.info("Patient deleted successfully with id={}", id);
     }
 
     @Operation(summary = "Update patient")
@@ -78,8 +84,11 @@ public class PatientController {
             content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
     })
     @PutMapping("/{id}")
-    public PatientDto updatePatient(@PathVariable Long id, @RequestBody UpdatePatientCommand patient) {
-        return patientService.updatePatient(id, patient);
+    public PatientDto updatePatient(@PathVariable Long id, @RequestBody UpdatePatientCommand command) {
+        log.info("Updating patient={} with id={}", command.email(), id);
+        PatientDto patient = patientService.updatePatient(id, command);
+        log.info("Patient updated successfully with id={}", id);
+        return patient;
     }
 
     @Operation(summary = "Change patient password")
@@ -93,6 +102,8 @@ public class PatientController {
     @PatchMapping("/{id}/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changePatientPassword(@PathVariable Long id, @RequestBody ChangePasswordCommand password) {
+        log.info("Changing patient={} id", id);
         patientService.changePassword(id, password);
+        log.info("Patient password changed successfully with id={}", id);
     }
 }

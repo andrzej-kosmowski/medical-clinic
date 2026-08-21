@@ -14,11 +14,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/doctors", produces = "application/json")
 @RequiredArgsConstructor
@@ -29,8 +32,8 @@ public class DoctorController {
     @Operation(summary = "Get all doctors")
     @ApiResponse(responseCode = "200", description = "List of doctors returned successfully")
     @GetMapping
-    public List<DoctorDto> getAll() {
-        return doctorService.getAllDoctors();
+    public PageResponse<DoctorDto> getAll(Pageable pageable) {
+        return doctorService.getAllDoctors(pageable);
     }
 
     @Operation(summary = "Get doctor by id")
@@ -66,7 +69,10 @@ public class DoctorController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public DoctorDto create(@RequestBody CreateDoctorCommand command) {
-        return doctorService.addDoctor(command);
+        log.info("Creating doctor with email: {}", command.email());
+        DoctorDto doctor = doctorService.addDoctor(command);
+        log.info("Doctor created successfully with id: {}", doctor.id());
+        return doctor;
     }
 
     @Operation(summary = "Update doctor")
@@ -79,7 +85,10 @@ public class DoctorController {
     })
     @PutMapping("/{id}")
     public DoctorDto update(@PathVariable Long id, @RequestBody UpdateDoctorCommand command) {
-        return doctorService.updateDoctor(id, command);
+        log.info("Updating doctor with id: {}", id);
+        DoctorDto doctor = doctorService.updateDoctor(id, command);
+        log.info("Doctor updated successfully with id: {}", doctor.id());
+        return doctor;
     }
 
     @Operation(summary = "Delete doctor")
@@ -91,7 +100,9 @@ public class DoctorController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
+        log.info("Deleting doctor with id: {}", id);
         doctorService.deleteDoctor(id);
+        log.info("Doctor deleted successfully with id: {}", id);
     }
 
     @Operation(summary = "Assign facility to doctor")
@@ -105,7 +116,10 @@ public class DoctorController {
             @PathVariable Long id,
             @RequestBody AssignFacilityCommand command
     ) {
-        return doctorService.assignFacility(id, command);
+        log.info("Assigning facility={} to doctor with id: {}", command.facilityId(), id);
+        DoctorDto doctor = doctorService.assignFacility(id, command);
+        log.info("Facility={} assigned successfully to doctor={}", command.facilityId(), id);
+        return doctor;
     }
 
     @Operation(summary = "Remove facility from doctor")
@@ -117,6 +131,8 @@ public class DoctorController {
     @DeleteMapping("/{doctorId}/facility/{facilityId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeFacility(@PathVariable Long doctorId, @PathVariable Long facilityId) {
+        log.info("Removing facility={} from doctor with id: {}", facilityId, doctorId);
         doctorService.removeFacility(doctorId, facilityId);
+        log.info("Facility removed successfully from doctor={}", doctorId);
     }
 }

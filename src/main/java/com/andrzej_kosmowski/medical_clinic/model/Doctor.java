@@ -6,7 +6,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -29,6 +31,8 @@ public class Doctor {
             inverseJoinColumns = @JoinColumn(name = "facility_id")
     )
     private Set<Facility> facilities = new HashSet<>();
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)
+    private List<Visit> visits = new ArrayList<>();
 
     public Doctor(String specialization) {
         this.specialization = specialization;
@@ -63,10 +67,27 @@ public class Doctor {
         }
     }
 
+    public void addVisit(Visit visit) {
+        if (!visits.contains(visit)) {
+            visits.add(visit);
+        }
+    }
+
     public void removeFacility(Facility facility) {
         if (facilities.remove(facility)) {
             facility.removeDoctor(this);
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Doctor doctor)) return false;
+        return id != null && id.equals(doctor.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
