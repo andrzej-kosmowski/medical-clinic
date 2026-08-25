@@ -4,6 +4,9 @@ import com.andrzej_kosmowski.medical_clinic.dto.PageResponse;
 import com.andrzej_kosmowski.medical_clinic.dto.patient.CreatePatientCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.patient.PatientDto;
 import com.andrzej_kosmowski.medical_clinic.dto.patient.UpdatePatientCommand;
+import com.andrzej_kosmowski.medical_clinic.dto.user.ChangePasswordCommand;
+import com.andrzej_kosmowski.medical_clinic.exception.patient.PatientAlreadyExistsException;
+import com.andrzej_kosmowski.medical_clinic.exception.patient.PatientNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.mapper.PatientMapper;
 import com.andrzej_kosmowski.medical_clinic.mapper.UserMapper;
 import com.andrzej_kosmowski.medical_clinic.model.Patient;
@@ -19,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -132,6 +136,108 @@ class PatientServiceTest {
                 () -> assertEquals("newtest@test.pl", result.email()),
                 () -> assertEquals("Adam", result.firstName()),
                 () -> assertEquals("Nowak", result.lastName())
+        );
+    }
+
+    @Test
+    void deletePatient_PatientExists_PatientDeleted() {
+        // given
+        Patient patient = new Patient("ABC123", "333444555", LocalDate.of(1980, 1, 1));
+        when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
+        // when
+        patientService.deletePatient(1L);
+        // then
+        verify(patientRepository).delete(patient);
+    }
+
+    @Test
+    void changePassword_PatientExists_PasswordChanged() {
+        // given
+        Patient patient = new Patient("ABC123", "333444555", LocalDate.of(1980, 1, 1));
+        User user = new User("Jan", "Nowak", "test@test.pl", "pass1");
+        patient.assignUser(user);
+        when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
+        ChangePasswordCommand command = new ChangePasswordCommand("newpass123");
+        // when
+        patientService.changePassword(1L, command);
+        // then
+        assertEquals("newpass123", patient.getUser().getPassword());
+    }
+
+    @Test
+    void getPatientById_PatientDoesNotExist_ThrowsException() {
+        // given
+        when(patientRepository.findById(1L)).thenReturn(Optional.empty());
+        // when
+        PatientNotFoundException exception = assertThrows(PatientNotFoundException.class,
+                () -> patientService.getPatientById(1L));
+        // then
+        Assertions.assertAll(
+                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getStatus()),
+                () -> assertEquals("Patient with id 1 not found", exception.getMessage())
+        );
+
+    }
+
+    @Test
+    void addPatient_PatientAlreadyExists_ThrowsException() {
+        // given
+        CreatePatientCommand command = new CreatePatientCommand("test@test.pl", "pass123",
+                "ABC123", "Jan", "Nowak", "111222333",
+                LocalDate.of(1980, 1, 1));
+        when(patientRepository.existsByIdCardNo("ABC123")).thenReturn(true);
+        // when
+        PatientAlreadyExistsException exception = assertThrows(PatientAlreadyExistsException.class,
+                () -> patientService.addPatient(command));
+        // then
+        Assertions.assertAll(
+                () -> assertEquals(HttpStatus.CONFLICT, exception.getStatus()),
+                () -> assertEquals("Patient with id card number ABC123 already exists", exception.getMessage())
+        );
+    }
+
+    @Test
+    void updatePatient_PatientDoesNotExist_ThrowsException() {
+        // given
+        UpdatePatientCommand command = new UpdatePatientCommand("newtest@test.pl", "ZXC321",
+                "Adam", "Nowak", "333222111", LocalDate.of(1995, 5, 5));
+        when(patientRepository.findById(1L)).thenReturn(Optional.empty());
+        // when
+        PatientNotFoundException exception = assertThrows(PatientNotFoundException.class,
+                () -> patientService.updatePatient(1L, command));
+        // then
+        Assertions.assertAll(
+                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getStatus()),
+                () -> assertEquals("Patient with id 1 not found", exception.getMessage())
+        );
+    }
+
+    @Test
+    void deletePatient_PatientDoesNotExist_ThrowsException() {
+        // given
+        when(patientRepository.findById(1L)).thenReturn(Optional.empty());
+        // when
+        PatientNotFoundException exception = assertThrows(PatientNotFoundException.class,
+                () -> patientService.deletePatient(1L));
+        // then
+        Assertions.assertAll(
+                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getStatus()),
+                () -> assertEquals("Patient with id 1 not found", exception.getMessage())
+        );
+    }
+
+    @Test
+    void changePassword_PatientDoesNotExist_ThrowsException() {
+        // given
+        when(patientRepository.findById(1L)).thenReturn(Optional.empty());
+        ChangePasswordCommand command = new ChangePasswordCommand("newpass123");
+        // when
+        PatientNotFoundException exception = assertThrows(PatientNotFoundException.class,
+                () -> patientService.changePassword(1L, command));
+        // then
+        Assertions.assertAll(
+                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getStatus()),
+                () -> assertEquals("Patient with id 1 not found", exception.getMessage())
         );
     }
 }
