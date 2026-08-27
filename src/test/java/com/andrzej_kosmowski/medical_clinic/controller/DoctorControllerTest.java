@@ -47,7 +47,10 @@ class DoctorControllerTest {
         // when & then
         mockMvc.perform(get("/doctors"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value("1"))
                 .andExpect(jsonPath("$.content[0].email").value("doctor@test.pl"))
+                .andExpect(jsonPath("$.content[0].firstName").value("Jan"))
+                .andExpect(jsonPath("$.content[0].lastName").value("Kowalski"))
                 .andExpect(jsonPath("$.content[0].specialization").value("Cardiologist"))
                 .andExpect(jsonPath("$.totalElements").value(1));
     }
@@ -61,7 +64,10 @@ class DoctorControllerTest {
         // when & then
         mockMvc.perform(get("/doctors/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.email").value("doctor@test.pl"))
+                .andExpect(jsonPath("$.firstName").value("Jan"))
+                .andExpect(jsonPath("$.lastName").value("Kowalski"))
                 .andExpect(jsonPath("$.specialization").value("Cardiologist"));
     }
 
@@ -74,8 +80,11 @@ class DoctorControllerTest {
         // when & then
         mockMvc.perform(get("/doctors/1/facilities"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("1"))
                 .andExpect(jsonPath("$[0].name").value("Medical Center"))
-                .andExpect(jsonPath("$[0].city").value("Warsaw"));
+                .andExpect(jsonPath("$[0].city").value("Warsaw"))
+                .andExpect(jsonPath("$[0].zipCode").value("00-001"))
+                .andExpect(jsonPath("$[0].street").value("Main Street"));
     }
 
     @Test
@@ -91,7 +100,10 @@ class DoctorControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(command)))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.email").value("doctor@test.pl"))
+                .andExpect(jsonPath("$.firstName").value("Jan"))
+                .andExpect(jsonPath("$.lastName").value("Kowalski"))
                 .andExpect(jsonPath("$.specialization").value("Cardiologist"));
         verify(doctorService).addDoctor(command);
     }
@@ -109,7 +121,10 @@ class DoctorControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(command)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.email").value("new@test.pl"))
                 .andExpect(jsonPath("$.firstName").value("Adam"))
+                .andExpect(jsonPath("$.lastName").value("Nowak"))
                 .andExpect(jsonPath("$.specialization").value("Dentist"));
     }
 
@@ -133,7 +148,10 @@ class DoctorControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(command)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.firstName").value("Jan"))
+                .andExpect(jsonPath("$.lastName").value("Kowalski"))
+                .andExpect(jsonPath("$.specialization").value("Cardiologist"));
         verify(doctorService).assignFacility(1L, command);
     }
 

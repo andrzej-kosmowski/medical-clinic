@@ -17,7 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,6 +44,9 @@ class VisitControllerTest {
         // when & then
         mockMvc.perform(get("/visits"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value("1"))
+                .andExpect(jsonPath("$.content[0].startTime").value("2030-01-01T10:00:00"))
+                .andExpect(jsonPath("$.content[0].endTime").value("2030-01-01T10:30:00"))
                 .andExpect(jsonPath("$.content[0].doctorId").value(1))
                 .andExpect(jsonPath("$.totalElements").value(1));
     }
@@ -59,6 +61,8 @@ class VisitControllerTest {
         mockMvc.perform(get("/visits/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.startTime").value("2030-01-01T10:00:00"))
+                .andExpect(jsonPath("$.endTime").value("2030-01-01T10:30:00"))
                 .andExpect(jsonPath("$.doctorId").value(1));
     }
 
@@ -71,7 +75,9 @@ class VisitControllerTest {
         // when & then
         mockMvc.perform(get("/visits/available"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1));
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].startTime").value("2030-01-01T10:00:00"))
+                .andExpect(jsonPath("$[0].endTime").value("2030-01-01T10:30:00"));
     }
 
     @Test
@@ -83,7 +89,10 @@ class VisitControllerTest {
         // when & then
         mockMvc.perform(get("/visits/patient/5"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].patientId").value(5));
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].startTime").value("2030-01-01T10:00:00"))
+                .andExpect(jsonPath("$[0].endTime").value("2030-01-01T10:30:00"))
+                .andExpect(jsonPath("$[0].patientId").value("5"));
     }
 
     @Test
@@ -95,7 +104,10 @@ class VisitControllerTest {
         // when & then
         mockMvc.perform(get("/visits/doctor/2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].doctorId").value(2));
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].startTime").value("2030-01-01T10:00:00"))
+                .andExpect(jsonPath("$[0].endTime").value("2030-01-01T10:30:00"))
+                .andExpect(jsonPath("$[0].doctorId").value("2"));
     }
 
     @Test
@@ -110,7 +122,9 @@ class VisitControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(command)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.startTime").value("2030-01-01T10:00:00"))
+                .andExpect(jsonPath("$.endTime").value("2030-01-01T10:30:00"));
         verify(visitService).createVisit(command);
     }
 
@@ -123,7 +137,10 @@ class VisitControllerTest {
         // when & then
         mockMvc.perform(patch("/visits/1/patient/5"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.patientId").value(5));
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.startTime").value("2030-01-01T10:00:00"))
+                .andExpect(jsonPath("$.endTime").value("2030-01-01T10:30:00"))
+                .andExpect(jsonPath("$.patientId").value("5"));
         verify(visitService).assignPatient(1L, 5L);
     }
 

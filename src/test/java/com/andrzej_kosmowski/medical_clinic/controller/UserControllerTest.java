@@ -44,6 +44,7 @@ class UserControllerTest {
         // when & then
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value("1"))
                 .andExpect(jsonPath("$.content[0].email").value("jan@test.pl"))
                 .andExpect(jsonPath("$.content[0].firstName").value("Jan"))
                 .andExpect(jsonPath("$.content[0].lastName").value("Kowalski"))
@@ -60,6 +61,7 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.email").value("jan@test.pl"))
+                .andExpect(jsonPath("$.firstName").value("Jan"))
                 .andExpect(jsonPath("$.lastName").value("Kowalski"));
     }
 
@@ -76,7 +78,9 @@ class UserControllerTest {
                 .content(objectMapper.writeValueAsString(command)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.email").value("jan@test.pl"));
+                .andExpect(jsonPath("$.email").value("jan@test.pl"))
+                .andExpect(jsonPath("$.firstName").value("Jan"))
+                .andExpect(jsonPath("$.lastName").value("Kowalski"));
         verify(userService).addUser(command);
     }
 
@@ -91,8 +95,11 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(command)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.firstName").value("Adam"))
+                .andExpect(jsonPath("$.lastName").value("Nowak"))
                 .andExpect(jsonPath("$.email").value("new@test.pl"));
+        verify(userService).updateUser(1L, command);
     }
 
     @Test

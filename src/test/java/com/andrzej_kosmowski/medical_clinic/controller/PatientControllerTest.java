@@ -29,7 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class PatientControllerTest {
-
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -51,7 +50,9 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$.content[0].email").value("test@test.pl"))
                 .andExpect(jsonPath("$.content[0].idCardNo").value("ABC123"))
                 .andExpect(jsonPath("$.content[0].firstName").value("Jan"))
-                .andExpect(jsonPath("$.content[0].lastName").value("Nowak"));
+                .andExpect(jsonPath("$.content[0].lastName").value("Nowak"))
+                .andExpect(jsonPath("$.content[0].phoneNumber").value("111222333"))
+                .andExpect(jsonPath("$.content[0].birthday").value("1990-01-01"));
     }
 
     @Test
@@ -66,7 +67,9 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$.email").value("test@test.pl"))
                 .andExpect(jsonPath("$.idCardNo").value("ABC123"))
                 .andExpect(jsonPath("$.firstName").value("Jan"))
-                .andExpect(jsonPath("$.lastName").value("Nowak"));
+                .andExpect(jsonPath("$.lastName").value("Nowak"))
+                .andExpect(jsonPath("$.phoneNumber").value("111222333"))
+                .andExpect(jsonPath("$.birthday").value("1990-01-01"));
     }
 
     @Test
@@ -85,7 +88,10 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$.email").value("test@test.pl"))
                 .andExpect(jsonPath("$.idCardNo").value("ABC123"))
                 .andExpect(jsonPath("$.firstName").value("Jan"))
-                .andExpect(jsonPath("$.lastName").value("Nowak"));
+                .andExpect(jsonPath("$.lastName").value("Nowak"))
+                .andExpect(jsonPath("$.phoneNumber").value("111222333"))
+                .andExpect(jsonPath("$.birthday").value("1990-01-01"));
+        verify(patientService).addPatient(command);
     }
 
     @Test
@@ -113,7 +119,9 @@ class PatientControllerTest {
                 .andExpect(jsonPath("$.idCardNo").value("ABC123"))
                 .andExpect(jsonPath("$.firstName").value("Adam"))
                 .andExpect(jsonPath("$.lastName").value("Nowak"))
-                .andExpect(jsonPath("$.phoneNumber").value("111222333"));
+                .andExpect(jsonPath("$.phoneNumber").value("111222333"))
+                .andExpect(jsonPath("$.birthday").value("1995-05-05"));
+        verify(patientService).updatePatient(1L, command);
     }
 
     @Test

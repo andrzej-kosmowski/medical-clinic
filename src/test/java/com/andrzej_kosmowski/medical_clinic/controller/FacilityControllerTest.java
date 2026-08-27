@@ -46,7 +46,12 @@ class FacilityControllerTest {
         // when & then
         mockMvc.perform(get("/facilities"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value("1"))
                 .andExpect(jsonPath("$.content[0].name").value("Medical Center"))
+                .andExpect(jsonPath("$.content[0].city").value("Warsaw"))
+                .andExpect(jsonPath("$.content[0].zipCode").value("00-001"))
+                .andExpect(jsonPath("$.content[0].street").value("Main Street"))
+                .andExpect(jsonPath("$.content[0].buildingNumber").value("10"))
                 .andExpect(jsonPath("$.totalElements").value(1));
     }
 
@@ -59,8 +64,12 @@ class FacilityControllerTest {
         // when & then
         mockMvc.perform(get("/facilities/1"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.name").value("Medical Center"))
                 .andExpect(jsonPath("$.city").value("Warsaw"))
-                .andExpect(jsonPath("$.street").value("Main Street"));
+                .andExpect(jsonPath("$.zipCode").value("00-001"))
+                .andExpect(jsonPath("$.street").value("Main Street"))
+                .andExpect(jsonPath("$.buildingNumber").value("10"));
     }
 
     @Test
@@ -72,7 +81,10 @@ class FacilityControllerTest {
         // when & then
         mockMvc.perform(get("/facilities/1/doctors"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("1"))
                 .andExpect(jsonPath("$[0].email").value("doctor@test.pl"))
+                .andExpect(jsonPath("$[0].firstName").value("Jan"))
+                .andExpect(jsonPath("$[0].lastName").value("Kowalski"))
                 .andExpect(jsonPath("$[0].specialization").value("Cardiologist"));
     }
 
@@ -89,8 +101,12 @@ class FacilityControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(command)))
                 .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.name").value("Medical Center"))
-                .andExpect(jsonPath("$.zipCode").value("00-001"));
+                .andExpect(jsonPath("$.city").value("Warsaw"))
+                .andExpect(jsonPath("$.zipCode").value("00-001"))
+                .andExpect(jsonPath("$.street").value("Main Street"))
+                .andExpect(jsonPath("$.buildingNumber").value("10"));
         verify(facilityService).addFacility(command);
     }
 
@@ -107,8 +123,13 @@ class FacilityControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(command)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.name").value("New Clinic"))
-                .andExpect(jsonPath("$.city").value("Cracow"));
+                .andExpect(jsonPath("$.city").value("Cracow"))
+                .andExpect(jsonPath("$.zipCode").value("30-001"))
+                .andExpect(jsonPath("$.street").value("Long Street"))
+                .andExpect(jsonPath("$.buildingNumber").value("20A"));
+        verify(facilityService).updateFacility((1L), command);
     }
 
     @Test
