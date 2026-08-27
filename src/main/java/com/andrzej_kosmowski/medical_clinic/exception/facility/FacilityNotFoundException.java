@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class FacilityNotFoundException extends MedicalClinicException {
     public FacilityNotFoundException(Long id) {
-        super("Facility with name " + id + " not found", HttpStatus.NOT_FOUND);
+        super("Facility with id " + id + " not found", HttpStatus.NOT_FOUND);
     }
 
     public FacilityNotFoundException(Set<Long> ids) {
@@ -20,7 +20,7 @@ public class FacilityNotFoundException extends MedicalClinicException {
                 .map(String::valueOf)
                 .collect(Collectors.joining(", "));
         if (ids.size() == 1) {
-            return String.format("Facility with name %s not found", facilities);
+            return String.format("Facility with id %s not found", facilities);
         }
         return String.format("Facilities %s not found", facilities);
     }
