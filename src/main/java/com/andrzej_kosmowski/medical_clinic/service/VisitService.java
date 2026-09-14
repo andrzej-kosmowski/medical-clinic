@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -61,6 +62,25 @@ public class VisitService {
     public List<VisitDto> getDoctorVisits(long doctorId) {
         Doctor doctor = findDoctorOrThrow(doctorId);
         return doctor.getVisits().stream()
+                .map(visitMapper::toDto)
+                .toList();
+    }
+
+    public List<VisitDto> getAvailableDoctorVisits(long doctorId) {
+        findDoctorOrThrow(doctorId);
+        return visitRepository.findAllByDoctorIdAndPatientIsNullAndStartTimeAfter(doctorId, LocalDateTime.now())
+                .stream()
+                .map(visitMapper::toDto)
+                .toList();
+    }
+
+    public List<VisitDto> getAvailableVisitsBySpecialization(String specialization, LocalDate date) {
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
+        return visitRepository
+                .findAllByDoctorSpecializationIgnoreCaseAndPatientIsNullAndStartTimeGreaterThanEqualAndStartTimeLessThan(
+                        specialization, start, end
+                ).stream()
                 .map(visitMapper::toDto)
                 .toList();
     }

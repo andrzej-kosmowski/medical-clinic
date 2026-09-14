@@ -8,6 +8,9 @@ import java.util.List;
 
 public interface VisitRepository extends JpaRepository<Visit, Long> {
     List<Visit> findAllByPatientIsNullAndStartTimeAfter(LocalDateTime startTime);
+    List<Visit> findAllByDoctorIdAndPatientIsNullAndStartTimeAfter(Long doctorId, LocalDateTime startTime);
+    List<Visit> findAllByDoctorSpecializationIgnoreCaseAndPatientIsNullAndStartTimeGreaterThanEqualAndStartTimeLessThan(
+            String specialization, LocalDateTime startTime, LocalDateTime endTime);
     boolean existsByDoctorIdAndStartTimeLessThanAndEndTimeGreaterThan(
             Long id, LocalDateTime end, LocalDateTime start
     );
