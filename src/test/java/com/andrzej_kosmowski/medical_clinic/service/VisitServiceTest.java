@@ -32,6 +32,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -218,6 +219,69 @@ class VisitServiceTest {
         Assertions.assertAll(
                 () -> assertEquals("Doctor with id 1 not found", exception.getMessage()),
                 () -> assertEquals(HttpStatus.NOT_FOUND, exception.getStatus())
+        );
+    }
+
+    @Test
+    void getAvailableDoctorVisits_DoctorExists_VisitsReturned() {
+        // given
+        Doctor doctor = new Doctor("Cardiologist");
+        LocalDateTime startTime = LocalDateTime.now()
+                .plusDays(7)
+                .withHour(10)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
+
+        Visit visit1 = new Visit(startTime, startTime.plusHours(1), doctor);
+        Visit visit2 = new Visit(startTime.plusDays(1), startTime.plusDays(1).plusHours(1), doctor);
+        when(doctorRepository.findById(1L)).thenReturn(Optional.of(doctor));
+        when(visitRepository.findAllByDoctorIdAndPatientIsNullAndStartTimeAfter(eq(1L), any(LocalDateTime.class)))
+                .thenReturn(List.of(visit1, visit2));
+        // when
+        List<VisitDto> result = visitService.getAvailableDoctorVisits(1L);
+        // then
+        Assertions.assertAll(
+                () -> assertEquals(2, result.size()),
+                () -> assertEquals(startTime, result.get(0).startTime()),
+                () -> assertEquals(startTime.plusDays(1), result.get(1).startTime())
+        );
+    }
+
+    @Test
+    void getAvailableDoctorVisits_DoctorNotFound_ThrowsException() {
+        // given
+        when(doctorRepository.findById(1L)).thenReturn(Optional.empty());
+        // when
+        DoctorNotFoundException exception = assertThrows(DoctorNotFoundException.class,
+                () -> visitService.getAvailableDoctorVisits(1L));
+        // then
+        Assertions.assertAll(
+                () -> assertEquals("Doctor with id 1 not found", exception.getMessage()),
+                () -> assertEquals(HttpStatus.NOT_FOUND, exception.getStatus())
+        );
+    }
+
+    @Test
+    void getAvailableVisits_SpecializationAndDateMatch_VisitsReturned() {
+        // given
+        LocalDate date =  LocalDate.now().minusDays(1);
+        LocalDateTime startTime = date.atTime(10, 0);
+        Doctor doctor = new Doctor("Cardiologist");
+        Visit visit1 = new Visit(startTime, startTime.plusHours(1), doctor);
+        Visit visit2 = new Visit(startTime.plusDays(1), startTime.plusDays(1).plusHours(1), doctor);
+        when(visitRepository
+                .findAllByDoctorSpecializationIgnoreCaseAndPatientIsNullAndStartTimeGreaterThanEqualAndStartTimeLessThan(
+                        eq("Cardiologist"), any(LocalDateTime.class), any(LocalDateTime.class)
+                ))
+                .thenReturn(List.of(visit1, visit2));
+        // when
+        List<VisitDto> result = visitService.getAvailableVisitsBySpecialization("Cardiologist", date);
+        // then
+        Assertions.assertAll(
+                () -> assertEquals(2, result.size()),
+                () -> assertEquals(startTime, result.get(0).startTime()),
+                () -> assertEquals(startTime.plusDays(1), result.get(1).startTime())
         );
     }
 
