@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -53,6 +54,41 @@ class DoctorControllerTest {
                 .andExpect(jsonPath("$.content[0].lastName").value("Kowalski"))
                 .andExpect(jsonPath("$.content[0].specialization").value("Cardiologist"))
                 .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void getDoctorsBySpecialization_DoctorsExist_Response200() throws Exception {
+        // given
+        DoctorDto doctor1 = new DoctorDto(1L, "doctor1@test.pl", "Jan", "Kowalski",
+                "Cardiologist", Set.of());
+        DoctorDto doctor2 = new DoctorDto(2L, "doctor2@test.pl", "Adam", "Nowak",
+                "Cardiologist", Set.of());
+        when(doctorService.getDoctorsBySpecialization("cardiologist")).thenReturn(List.of(doctor1, doctor2));
+        // when & then
+        mockMvc.perform(get("/doctors/specialization/cardiologist"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].email").value("doctor1@test.pl"))
+                .andExpect(jsonPath("$[0].firstName").value("Jan"))
+                .andExpect(jsonPath("$[0].lastName").value("Kowalski"))
+                .andExpect(jsonPath("$[0].specialization").value("Cardiologist"))
+                .andExpect(jsonPath("$[1].id").value("2"))
+                .andExpect(jsonPath("$[1].email").value("doctor2@test.pl"))
+                .andExpect(jsonPath("$[1].firstName").value("Adam"))
+                .andExpect(jsonPath("$[1].lastName").value("Nowak"))
+                .andExpect(jsonPath("$[1].specialization").value("Cardiologist"));
+        verify(doctorService).getDoctorsBySpecialization("cardiologist");
+    }
+
+    @Test
+    void getDoctorsBySpecialization_DoctorsNotExist_Response200EmptyList() throws Exception {
+        // given
+        when(doctorService.getDoctorsBySpecialization("cardiologist")).thenReturn(List.of());
+        // when & then
+        mockMvc.perform(get("/doctors/specialization/cardiologist"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+        verify(doctorService).getDoctorsBySpecialization("cardiologist");
     }
 
     @Test
