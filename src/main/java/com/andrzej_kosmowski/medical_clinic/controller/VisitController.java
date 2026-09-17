@@ -105,7 +105,8 @@ public class VisitController {
     })
     @GetMapping("/search")
     public List<VisitDto> getBySpecializationAndTimeRange(
-            @RequestParam String specialization, @RequestParam LocalDateTime from, @RequestParam LocalDateTime to) {
+            @RequestParam(required = false) String specialization, @RequestParam LocalDateTime from,
+            @RequestParam LocalDateTime to) {
         return visitService.getBySpecializationAndTimeRange(specialization, from, to);
     }
 
