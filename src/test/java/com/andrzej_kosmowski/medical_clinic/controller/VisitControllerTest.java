@@ -14,12 +14,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -108,6 +108,81 @@ class VisitControllerTest {
                 .andExpect(jsonPath("$[0].startTime").value("2030-01-01T10:00:00"))
                 .andExpect(jsonPath("$[0].endTime").value("2030-01-01T10:30:00"))
                 .andExpect(jsonPath("$[0].doctorId").value("2"));
+    }
+
+    @Test
+    void getAvailableDoctorVisits_Response200() throws Exception {
+        // given
+        VisitDto visit = new VisitDto(1L, LocalDateTime.of(2030, 1, 1, 10, 0),
+                LocalDateTime.of(2030, 1, 1, 10, 30), 2L, null);
+        when(visitService.getAvailableDoctorVisits(2L)).thenReturn(List.of(visit));
+        // when & then
+        mockMvc.perform(get("/visits/doctor/2/available"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].startTime").value("2030-01-01T10:00:00"))
+                .andExpect(jsonPath("$[0].endTime").value("2030-01-01T10:30:00"))
+                .andExpect(jsonPath("$[0].doctorId").value("2"));
+    }
+
+    @Test
+    void getAvailableVisitsBySpecializationAndDate_Response200() throws Exception {
+        // given
+        VisitDto visit = new VisitDto(1L, LocalDateTime.of(2030, 1, 1, 10, 0),
+                LocalDateTime.of(2030, 1, 1, 10, 30), 2L, null);
+        when(visitService.getAvailableVisitsBySpecialization("pediatra", LocalDate.of(2030, 1, 1)))
+                .thenReturn(List.of(visit));
+        // when & then
+        mockMvc.perform(get("/visits/available/search")
+                    .param("specialization", "pediatra")
+                    .param("date", "2030-01-01"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].startTime").value("2030-01-01T10:00:00"))
+                .andExpect(jsonPath("$[0].endTime").value("2030-01-01T10:30:00"))
+                .andExpect(jsonPath("$[0].doctorId").value("2"));
+    }
+
+    @Test
+    void getVisitsBySpecializationAndTimeRange_Response200() throws Exception {
+        // given
+        LocalDateTime from = LocalDateTime.of(2030, 1, 1, 0, 0);
+        LocalDateTime to = LocalDateTime.of(2030, 1, 31, 23, 59);
+        VisitDto visit = new VisitDto(1L, LocalDateTime.of(2030, 1, 1, 10, 0),
+                LocalDateTime.of(2030, 1, 1, 10, 30), 2L, 5L);
+        when(visitService.getBySpecializationAndTimeRange("Cardiologist", from, to))
+                .thenReturn(List.of(visit));
+        // when & then
+        mockMvc.perform(get("/visits/search")
+                        .param("specialization", "Cardiologist")
+                        .param("from", "2030-01-01T00:00:00")
+                        .param("to", "2030-01-31T23:59:00"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].doctorId").value("2"))
+                .andExpect(jsonPath("$[0].patientId").value("5"))
+                .andExpect(jsonPath("$[0].startTime").value("2030-01-01T10:00:00"));
+        verify(visitService).getBySpecializationAndTimeRange("Cardiologist", from, to);
+    }
+
+    @Test
+    void getAvailableVisitsInTimeRange_Response200() throws Exception {
+        // given
+        LocalDateTime from = LocalDateTime.of(2030, 1, 1, 0, 0);
+        LocalDateTime to = LocalDateTime.of(2030, 1, 31, 23, 59);
+        VisitDto visit = new VisitDto(1L, LocalDateTime.of(2030, 1, 1, 10, 0),
+                LocalDateTime.of(2030, 1, 1, 10, 30), 2L, null);
+        when(visitService.getAvailableVisits(null, from, to)).thenReturn(List.of(visit));
+        // when & then
+        mockMvc.perform(get("/visits/available/range")
+                        .param("from", "2030-01-01T00:00:00")
+                        .param("to", "2030-01-31T23:59:00"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].doctorId").value("2"))
+                .andExpect(jsonPath("$[0].patientId").doesNotExist())
+                .andExpect(jsonPath("$[0].startTime").value("2030-01-01T10:00:00"));
+        verify(visitService).getAvailableVisits(null, from, to);
     }
 
     @Test

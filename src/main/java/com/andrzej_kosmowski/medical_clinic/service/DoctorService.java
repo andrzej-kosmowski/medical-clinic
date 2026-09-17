@@ -45,6 +45,12 @@ public class DoctorService {
         return doctorMapper.toDto(doctor);
     }
 
+    public List<DoctorDto> getDoctorsBySpecialization(String specialization) {
+        return doctorRepository.findAllBySpecializationIgnoreCase(specialization).stream()
+                .map(doctorMapper::toDto)
+                .toList();
+    }
+
     public List<FacilityDto> getFacilities(Long id) {
         Doctor doctor = findDoctorOrThrow(id);
         return doctor.getFacilities().stream()

@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -73,6 +75,54 @@ public class VisitController {
     public List<VisitDto> getDoctorVisits(@PathVariable long doctorId) {
         return visitService.getDoctorVisits(doctorId);
     }
+
+    @Operation(summary = "Get available visits for doctor")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Available visits returned successfully"),
+            @ApiResponse(responseCode = "404", description = "Doctor not found",
+                    content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
+    })
+    @GetMapping("/doctor/{doctorId}/available")
+    public List<VisitDto> getAvailableDoctorVisits(@PathVariable long doctorId) {
+        return visitService.getAvailableDoctorVisits(doctorId);
+    }
+
+    @Operation(summary = "Get available visits by specialization and date")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Available visits returned successfully")
+    })
+    @GetMapping("/available/search")
+    public List<VisitDto> getAvailableVisitsBySpecialization(
+            @RequestParam String specialization, @RequestParam LocalDate date) {
+        return visitService.getAvailableVisitsBySpecialization(specialization, date);
+    }
+
+    @Operation(summary = "Get visits by specialization and time range")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Visits returned successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid time range",
+                    content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
+    })
+    @GetMapping("/search")
+    public List<VisitDto> getBySpecializationAndTimeRange(
+            @RequestParam(required = false) String specialization, @RequestParam LocalDateTime from,
+            @RequestParam LocalDateTime to) {
+        return visitService.getBySpecializationAndTimeRange(specialization, from, to);
+    }
+
+    @Operation(summary = "Get available visits by time range and optional specialization")
+    @ApiResponses(
+            {@ApiResponse(responseCode = "200", description = "Available visits returned successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid time range",
+                    content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
+    })
+    @GetMapping("/available/range")
+    public List<VisitDto> getAvailableVisits(
+            @RequestParam(required = false) String specialization,
+            @RequestParam LocalDateTime from, @RequestParam LocalDateTime to) {
+        return visitService.getAvailableVisits(specialization, from, to);
+    }
+
 
     @Operation(summary = "Doctor creates a new available visit slot")
     @ApiResponses({

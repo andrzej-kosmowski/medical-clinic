@@ -5,10 +5,7 @@ import com.andrzej_kosmowski.medical_clinic.dto.visit.CreateVisitCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.visit.VisitDto;
 import com.andrzej_kosmowski.medical_clinic.exception.doctor.DoctorNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.exception.patient.PatientNotFoundException;
-import com.andrzej_kosmowski.medical_clinic.exception.visit.DoctorOverlappingVisitException;
-import com.andrzej_kosmowski.medical_clinic.exception.visit.PatientOverlappingVisitException;
-import com.andrzej_kosmowski.medical_clinic.exception.visit.VisitAlreadyBookedException;
-import com.andrzej_kosmowski.medical_clinic.exception.visit.VisitNotFoundException;
+import com.andrzej_kosmowski.medical_clinic.exception.visit.*;
 import com.andrzej_kosmowski.medical_clinic.mapper.VisitMapper;
 import com.andrzej_kosmowski.medical_clinic.model.Doctor;
 import com.andrzej_kosmowski.medical_clinic.model.Patient;
@@ -22,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -59,8 +57,42 @@ public class VisitService {
     }
 
     public List<VisitDto> getDoctorVisits(long doctorId) {
-        Doctor doctor = findDoctorOrThrow(doctorId);
-        return doctor.getVisits().stream()
+       findDoctorOrThrow(doctorId);
+        return visitRepository.findAllByDoctorId(doctorId).stream()
+                .map(visitMapper::toDto)
+                .toList();
+    }
+
+    public List<VisitDto> getAvailableDoctorVisits(long doctorId) {
+        findDoctorOrThrow(doctorId);
+        return visitRepository.findAllByDoctorIdAndPatientIsNullAndStartTimeAfter(doctorId, LocalDateTime.now())
+                .stream()
+                .map(visitMapper::toDto)
+                .toList();
+    }
+
+    public List<VisitDto> getAvailableVisitsBySpecialization(String specialization, LocalDate date) {
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(1).atStartOfDay();
+        return visitRepository
+                .findAllByDoctorSpecializationIgnoreCaseAndPatientIsNullAndStartTimeGreaterThanEqualAndStartTimeLessThan(
+                        specialization, start, end
+                ).stream()
+                .map(visitMapper::toDto)
+                .toList();
+    }
+
+    public List<VisitDto> getBySpecializationAndTimeRange(String specialization, LocalDateTime from, LocalDateTime to) {
+        validateTimeRange(from, to);
+        return visitRepository.findAllByDoctorSpecializationIgnoreCaseAndStartTimeGreaterThanEqualAndStartTimeLessThan(
+                specialization, from, to).stream()
+                .map(visitMapper::toDto)
+                .toList();
+    }
+
+    public List<VisitDto> getAvailableVisits(String specialization, LocalDateTime from, LocalDateTime to) {
+        validateTimeRange(from, to);
+        return visitRepository.findAvailableInRange(from, to, specialization).stream()
                 .map(visitMapper::toDto)
                 .toList();
     }
@@ -104,7 +136,7 @@ public class VisitService {
         log.info("Deleting visitId={}", visitId);
         Visit visit = findVisitOrThrow(visitId);
         if (!visit.isAvailable()) {
-            throw new VisitAlreadyBookedException(visitId);
+            visit.cancelVisit();
         }
         visitRepository.delete(visit);
         log.info("Visit deleted successfully: visitId={}", visitId);
@@ -123,6 +155,14 @@ public class VisitService {
                 patientId, endTime, startTime);
         if (overlaps) {
             throw new PatientOverlappingVisitException(patientId);
+        }
+    }
+    private void validateTimeRange(LocalDateTime from, LocalDateTime to) {
+        if (from == null || to == null) {
+            throw new InvalidVisitDataException("Range start and end must be provided");
+        }
+        if (!to.isAfter(from)) {
+            throw new InvalidVisitDataException("Range end must be after range start");
         }
     }
 
