@@ -144,6 +144,48 @@ class VisitControllerTest {
     }
 
     @Test
+    void getVisitsBySpecializationAndTimeRange_Response200() throws Exception {
+        // given
+        LocalDateTime from = LocalDateTime.of(2030, 1, 1, 0, 0);
+        LocalDateTime to = LocalDateTime.of(2030, 1, 31, 23, 59);
+        VisitDto visit = new VisitDto(1L, LocalDateTime.of(2030, 1, 1, 10, 0),
+                LocalDateTime.of(2030, 1, 1, 10, 30), 2L, 5L);
+        when(visitService.getBySpecializationAndTimeRange("Cardiologist", from, to))
+                .thenReturn(List.of(visit));
+        // when & then
+        mockMvc.perform(get("/visits/search")
+                        .param("specialization", "Cardiologist")
+                        .param("from", "2030-01-01T00:00:00")
+                        .param("to", "2030-01-31T23:59:00"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].doctorId").value("2"))
+                .andExpect(jsonPath("$[0].patientId").value("5"))
+                .andExpect(jsonPath("$[0].startTime").value("2030-01-01T10:00:00"));
+        verify(visitService).getBySpecializationAndTimeRange("Cardiologist", from, to);
+    }
+
+    @Test
+    void getAvailableVisitsInTimeRange_Response200() throws Exception {
+        // given
+        LocalDateTime from = LocalDateTime.of(2030, 1, 1, 0, 0);
+        LocalDateTime to = LocalDateTime.of(2030, 1, 31, 23, 59);
+        VisitDto visit = new VisitDto(1L, LocalDateTime.of(2030, 1, 1, 10, 0),
+                LocalDateTime.of(2030, 1, 1, 10, 30), 2L, null);
+        when(visitService.getAvailableVisits(null, from, to)).thenReturn(List.of(visit));
+        // when & then
+        mockMvc.perform(get("/visits/available/range")
+                        .param("from", "2030-01-01T00:00:00")
+                        .param("to", "2030-01-31T23:59:00"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].doctorId").value("2"))
+                .andExpect(jsonPath("$[0].patientId").doesNotExist())
+                .andExpect(jsonPath("$[0].startTime").value("2030-01-01T10:00:00"));
+        verify(visitService).getAvailableVisits(null, from, to);
+    }
+
+    @Test
     void create_ValidCommand_Response201() throws Exception {
         // given
         CreateVisitCommand command = new CreateVisitCommand(1L, LocalDateTime.of(2030, 1, 1, 10, 0),
