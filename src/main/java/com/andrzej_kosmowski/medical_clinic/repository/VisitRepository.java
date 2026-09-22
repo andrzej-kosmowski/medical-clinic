@@ -1,14 +1,15 @@
 package com.andrzej_kosmowski.medical_clinic.repository;
 
 import com.andrzej_kosmowski.medical_clinic.model.Visit;
+import com.andrzej_kosmowski.medical_clinic.specification.VisitSpecifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface VisitRepository extends JpaRepository<Visit, Long> {
+public interface VisitRepository extends JpaRepository<Visit, Long>, JpaSpecificationExecutor<Visit> {
     List<Visit> findAllByPatientIsNullAndStartTimeAfter(LocalDateTime startTime);
     List<Visit> findAllByDoctorIdAndPatientIsNullAndStartTimeAfter(Long doctorId, LocalDateTime startTime);
     List<Visit> findAllByDoctorSpecializationIgnoreCaseAndPatientIsNullAndStartTimeGreaterThanEqualAndStartTimeLessThan(
@@ -16,19 +17,12 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
     List<Visit> findAllByDoctorId(Long doctorId);
     List<Visit> findAllByDoctorSpecializationIgnoreCaseAndStartTimeGreaterThanEqualAndStartTimeLessThan(
             String specialization, LocalDateTime startTime, LocalDateTime endTime);
-    @Query("""
-        SELECT v
-        FROM Visit v
-        JOIN v.doctor d
-        WHERE v.patient is NULL
-            AND v.startTime >= :from
-            AND v.startTime < :to
-            AND (:specialization is NULL OR LOWER(d.specialization) = LOWER(:specialization))
-        """)
-    List<Visit> findAvailableInRange(
-            @Param("from") LocalDateTime from,
-            @Param("to") LocalDateTime to,
-            @Param("specialization") String specialization);
+    default List<Visit> findAvailableInRange(LocalDateTime from, LocalDateTime to, String specialization) {
+        Specification<Visit> spec = VisitSpecifications.hasNoPatient()
+                .and(VisitSpecifications.startsBetween(from, to))
+                .and(VisitSpecifications.hasSpecialization(specialization));
+        return findAll(spec);
+    }
     boolean existsByDoctorIdAndStartTimeLessThanAndEndTimeGreaterThan(
             Long id, LocalDateTime end, LocalDateTime start
     );
