@@ -15,6 +15,7 @@ services:
     networks:
       - default
       - elk-network
+      - medical-network
 
   db:
     image: postgres
@@ -49,4 +50,6 @@ volumes:
 networks:
   default:
   elk-network:
+    external: true
+  medical-network:
     external: true
