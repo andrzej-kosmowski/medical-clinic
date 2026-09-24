@@ -3,6 +3,7 @@ package com.andrzej_kosmowski.medical_clinic.service;
 import com.andrzej_kosmowski.medical_clinic.dto.PageResponse;
 import com.andrzej_kosmowski.medical_clinic.dto.visit.CreateVisitCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.visit.VisitDto;
+import com.andrzej_kosmowski.medical_clinic.dto.visit.VisitSearchCriteria;
 import com.andrzej_kosmowski.medical_clinic.exception.doctor.DoctorNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.exception.patient.PatientNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.exception.visit.*;
@@ -114,31 +115,6 @@ class VisitServiceTest {
         Assertions.assertAll(
                 () -> assertEquals("Visit with id 1 not found", exception.getMessage()),
                 () -> assertEquals(HttpStatus.NOT_FOUND, exception.getStatus())
-        );
-    }
-
-    @Test
-    void getAvailableVisits_AvailableVisitsExist_VisitsReturned() {
-        // given
-        LocalDateTime startTime = LocalDateTime.now()
-                .plusDays(7)
-                .withHour(10)
-                .withMinute(0)
-                .withSecond(0)
-                .withNano(0);
-        LocalDateTime endTime = startTime.plusHours(1);
-        Doctor doctor = new Doctor("Cardiologist");
-        Visit visit1 = new Visit(startTime, endTime, doctor);
-        Visit visit2 = new Visit(startTime.plusHours(2), endTime.plusHours(2), doctor);
-        when(visitRepository.findAllByPatientIsNullAndStartTimeAfter(any(LocalDateTime.class)))
-                .thenReturn(List.of(visit1, visit2));
-        // when
-        List<VisitDto> result = visitService.getAvailableVisits();
-        // then
-        Assertions.assertAll(
-                () -> assertEquals(2, result.size()),
-                () -> assertEquals(startTime, result.get(0).startTime()),
-                () -> assertEquals(startTime.plusHours(2), result.get(1).startTime())
         );
     }
 
@@ -265,40 +241,41 @@ class VisitServiceTest {
     }
 
     @Test
-    void getAvailableVisits_SpecializationAndDateMatch_VisitsReturned() {
+    void search_WithSpecializationAndDate_VisitsReturned() {
         // given
-        LocalDate date =  LocalDate.now().minusDays(1);
+        LocalDate date = LocalDate.now().minusDays(1);
         LocalDateTime startTime = date.atTime(10, 0);
+        LocalDateTime expectedFrom = date.atStartOfDay();
+        LocalDateTime expectedTo = date.plusDays(1).atStartOfDay();
         Doctor doctor = new Doctor("Cardiologist");
         Visit visit1 = new Visit(startTime, startTime.plusHours(1), doctor);
-        Visit visit2 = new Visit(startTime.plusDays(1), startTime.plusDays(1).plusHours(1), doctor);
-        when(visitRepository
-                .findAllByDoctorSpecializationIgnoreCaseAndPatientIsNullAndStartTimeGreaterThanEqualAndStartTimeLessThan(
-                        eq("Cardiologist"), any(LocalDateTime.class), any(LocalDateTime.class)
-                ))
+        Visit visit2 = new Visit(startTime.plusHours(2), startTime.plusHours(3), doctor);
+        VisitSearchCriteria criteria = new VisitSearchCriteria("Cardiologist", null, expectedFrom, expectedTo, true);
+        when(visitRepository.search(criteria))
                 .thenReturn(List.of(visit1, visit2));
         // when
-        List<VisitDto> result = visitService.getAvailableVisitsBySpecialization("Cardiologist", date);
+        List<VisitDto> result = visitService.search(criteria);
         // then
         Assertions.assertAll(
                 () -> assertEquals(2, result.size()),
                 () -> assertEquals(startTime, result.get(0).startTime()),
-                () -> assertEquals(startTime.plusDays(1), result.get(1).startTime())
+                () -> assertEquals(startTime.plusHours(2), result.get(1).startTime())
         );
     }
 
     @Test
-    void getBySpecializationAndTimeRange_ValidRange_VisitsReturned() {
+    void search_WithSpecializationAndTimeRange_VisitsReturned() {
         // given
         LocalDateTime from = LocalDateTime.of(2030, 1, 1, 0, 0);
         LocalDateTime to = LocalDateTime.of(2030, 1, 31, 23, 59);
         Doctor doctor = new Doctor("Cardiologist");
         Visit visit1 = new Visit(from.plusDays(2), from.plusDays(2).plusHours(1), doctor);
         Visit visit2 = new Visit(from.plusDays(10), from.plusDays(10).plusHours(1), doctor);
-        when(visitRepository.findAllByDoctorSpecializationIgnoreCaseAndStartTimeGreaterThanEqualAndStartTimeLessThan(
-                "Cardiologist", from, to)).thenReturn(List.of(visit1, visit2));
+        VisitSearchCriteria criteria = new VisitSearchCriteria("Cardiologist", null, from, to, false);
+        when(visitRepository.search(criteria))
+                .thenReturn(List.of(visit1, visit2));
         // when
-        List<VisitDto> result = visitService.getBySpecializationAndTimeRange("Cardiologist", from, to);
+        List<VisitDto> result = visitService.search(criteria);
         // then
         Assertions.assertAll(
                 () -> assertEquals(2, result.size()),
@@ -308,29 +285,32 @@ class VisitServiceTest {
     }
 
     @Test
-    void getBySpecializationAndTimeRange_InvalidRange_ThrowsException() {
+    void search_InvalidTimeRange_ThrowsException() {
         // given
         LocalDateTime from = LocalDateTime.of(2030, 1, 31, 0, 0);
         LocalDateTime to = LocalDateTime.of(2030, 1, 1, 0, 0);
+        VisitSearchCriteria criteria = new VisitSearchCriteria("Cardiologist", null, from, to, true);
         // when
         InvalidVisitDataException exception = assertThrows(InvalidVisitDataException.class,
-                () -> visitService.getBySpecializationAndTimeRange("Cardiologist", from, to)
+                () -> visitService.search(criteria)
         );
         // then
         assertEquals("Range end must be after range start", exception.getMessage());
     }
 
     @Test
-    void getAvailableVisits_WithSpecialization_VisitsReturned() {
+    void search_AvailableOnlyWithSpecialization_VisitsReturned() {
         // given
         LocalDateTime from = LocalDateTime.of(2030, 1, 1, 0, 0);
         LocalDateTime to = LocalDateTime.of(2030, 1, 31, 23, 59);
         Doctor doctor = new Doctor("Cardiologist");
         Visit visit = new Visit(from.plusDays(2), from.plusDays(2).plusHours(1), doctor);
-        when(visitRepository.findAvailableInRange(from, to, "Cardiologist"))
+        VisitSearchCriteria criteria = new VisitSearchCriteria("Cardiologist", null, from, to, true);
+
+        when(visitRepository.search(criteria))
                 .thenReturn(List.of(visit));
         // when
-        List<VisitDto> result = visitService.getAvailableVisits("Cardiologist", from, to);
+        List<VisitDto> result = visitService.search(criteria);
         // then
         Assertions.assertAll(
                 () -> assertEquals(1, result.size()),
@@ -340,21 +320,38 @@ class VisitServiceTest {
     }
 
     @Test
-    void getAvailableVisits_WithoutSpecialization_VisitsReturned() {
+    void search_AvailableOnlyWithoutSpecialization_VisitsReturned() {
         // given
         LocalDateTime from = LocalDateTime.of(2030, 1, 1, 0, 0);
         LocalDateTime to = LocalDateTime.of(2030, 1, 31, 23, 59);
         Doctor doctor = new Doctor("Cardiologist");
         Visit visit = new Visit(from.plusDays(2), from.plusDays(2).plusHours(1), doctor);
-        when(visitRepository.findAvailableInRange(from, to, null))
+        VisitSearchCriteria criteria = new VisitSearchCriteria(null, null, from, to, true);
+        when(visitRepository.search(criteria))
                 .thenReturn(List.of(visit));
         // when
-        List<VisitDto> result = visitService.getAvailableVisits(null, from, to);
+        List<VisitDto> result = visitService.search(criteria);
         // then
         Assertions.assertAll(
                 () -> assertEquals(1, result.size()),
                 () -> assertEquals(visit.getStartTime(), result.get(0).startTime())
         );
+    }
+
+    @Test
+    void search_NoFilters_VisitsReturned() {
+        // given
+        Doctor doctor = new Doctor("Cardiologist");
+        Visit visit = new Visit(LocalDateTime.of(2030, 1, 1, 10, 0),
+                LocalDateTime.of(2030, 1, 1, 11, 0), doctor);
+        VisitSearchCriteria criteria = new VisitSearchCriteria(null, null, null, null,false);
+
+        when(visitRepository.search(criteria))
+                .thenReturn(List.of(visit));
+        // when
+        List<VisitDto> result = visitService.search(criteria);
+        // then
+        assertEquals(1, result.size());
     }
 
     @Test
