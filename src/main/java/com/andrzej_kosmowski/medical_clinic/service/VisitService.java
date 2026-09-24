@@ -3,6 +3,7 @@ package com.andrzej_kosmowski.medical_clinic.service;
 import com.andrzej_kosmowski.medical_clinic.dto.PageResponse;
 import com.andrzej_kosmowski.medical_clinic.dto.visit.CreateVisitCommand;
 import com.andrzej_kosmowski.medical_clinic.dto.visit.VisitDto;
+import com.andrzej_kosmowski.medical_clinic.dto.visit.VisitSearchCriteria;
 import com.andrzej_kosmowski.medical_clinic.exception.doctor.DoctorNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.exception.patient.PatientNotFoundException;
 import com.andrzej_kosmowski.medical_clinic.exception.visit.*;
@@ -42,12 +43,6 @@ public class VisitService {
         return visitMapper.toDto(visit);
     }
 
-    public List<VisitDto> getAvailableVisits() {
-        return visitRepository.findAllByPatientIsNullAndStartTimeAfter(LocalDateTime.now())
-                .stream()
-                .map(visitMapper::toDto)
-                .toList();
-    }
 
     public List<VisitDto> getPatientVisits(long patientId) {
         Patient patient = findPatientOrThrow(patientId);
@@ -71,28 +66,11 @@ public class VisitService {
                 .toList();
     }
 
-    public List<VisitDto> getAvailableVisitsBySpecialization(String specialization, LocalDate date) {
-        LocalDateTime start = date.atStartOfDay();
-        LocalDateTime end = date.plusDays(1).atStartOfDay();
-        return visitRepository
-                .findAllByDoctorSpecializationIgnoreCaseAndPatientIsNullAndStartTimeGreaterThanEqualAndStartTimeLessThan(
-                        specialization, start, end
-                ).stream()
-                .map(visitMapper::toDto)
-                .toList();
-    }
-
-    public List<VisitDto> getBySpecializationAndTimeRange(String specialization, LocalDateTime from, LocalDateTime to) {
-        validateTimeRange(from, to);
-        return visitRepository.findAllByDoctorSpecializationIgnoreCaseAndStartTimeGreaterThanEqualAndStartTimeLessThan(
-                specialization, from, to).stream()
-                .map(visitMapper::toDto)
-                .toList();
-    }
-
-    public List<VisitDto> getAvailableVisits(String specialization, LocalDateTime from, LocalDateTime to) {
-        validateTimeRange(from, to);
-        return visitRepository.findAvailableInRange(from, to, specialization).stream()
+    public List<VisitDto> search(VisitSearchCriteria criteria) {
+        if (criteria.effectiveFrom() != null && criteria.effectiveTo() != null) {
+            validateTimeRange(criteria.effectiveFrom(), criteria.effectiveTo());
+        }
+        return visitRepository.search(criteria).stream()
                 .map(visitMapper::toDto)
                 .toList();
     }
