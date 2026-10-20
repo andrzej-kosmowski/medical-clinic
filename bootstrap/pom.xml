@@ -34,7 +34,6 @@
             <artifactId>adapter</artifactId>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

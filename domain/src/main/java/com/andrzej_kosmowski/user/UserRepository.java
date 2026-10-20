@@ -1,11 +1,13 @@
 package com.andrzej_kosmowski.user;
 
-import java.util.List;
+import com.andrzej_kosmowski.pagination.PageQuery;
+import com.andrzej_kosmowski.pagination.PageResult;
+
 import java.util.Optional;
 
 public interface UserRepository {
     Optional<User> findById(long id);
-    List<User> findAll(int page, int size);
+    PageResult<User> findAll(PageQuery query);
     boolean existsByEmail(String email);
     boolean existsByEmailAndIdNot(String email, long id);
     User save(User user);

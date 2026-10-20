@@ -1,5 +1,7 @@
 package com.andrzej_kosmowski.user;
 
+import com.andrzej_kosmowski.pagination.PageQuery;
+import com.andrzej_kosmowski.pagination.PageResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,11 +18,11 @@ public class UserService implements UserUseCase {
     }
 
     @Override
-    public List<User> getAll(int page, int size) {
-        if (page < 0 || size < 1) {
+    public PageResult<User> getAll(PageQuery query) {
+        if (query.page() < 0 || query.size() < 1) {
             throw new IllegalArgumentException("Invalid page or size");
         }
-        return userRepository.findAll(page, size);
+        return userRepository.findAll(query);
     }
 
     @Override
