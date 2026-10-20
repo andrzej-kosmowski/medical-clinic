@@ -78,6 +78,34 @@ class DoctorServiceTest {
     }
 
     @Test
+    void getDoctorsBySpecialization_DoctorExists_DoctrorsReturned() {
+        // given
+        Doctor doctor1 = new Doctor("Cardiologist");
+        Doctor doctor2 = new Doctor("Cardiologist");
+        when(doctorRepository.findAllBySpecializationIgnoreCase("Cardiologist"))
+                .thenReturn(List.of(doctor1, doctor2));
+        // when
+        List<DoctorDto> result = doctorService.getDoctorsBySpecialization("Cardiologist");
+        // then
+        Assertions.assertAll(
+                () -> assertEquals(2, result.size()),
+                () -> assertEquals("Cardiologist", result.get(0).specialization()),
+                () -> assertEquals("Cardiologist", result.get(1).specialization())
+        );
+    }
+
+    @Test
+    void getDoctorsBySpecialization_DoctorDoesNotExist_EmptyListReturned() {
+        // given
+        when(doctorRepository.findAllBySpecializationIgnoreCase("Cardiologist")).thenReturn(List.of());
+        // when
+        List<DoctorDto> result = doctorService.getDoctorsBySpecialization("Cardiologist");
+        // then
+        assertTrue(result.isEmpty());
+        verify(doctorRepository).findAllBySpecializationIgnoreCase("Cardiologist");
+    }
+
+    @Test
     void getDoctorById_DoctorExists_DoctorReturned() {
         // given
         Doctor doctor = new Doctor("Cardiologist");

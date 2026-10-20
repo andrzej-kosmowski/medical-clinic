@@ -47,6 +47,13 @@ public class DoctorController {
         return doctorService.getDoctorById(id);
     }
 
+    @Operation(summary = "Get all doctors by specialization")
+    @ApiResponse(responseCode = "200", description = "List of doctors returned successfully")
+    @GetMapping("/specialization/{specialization}")
+    public List<DoctorDto> getBySpecialization(@PathVariable String specialization) {
+        return doctorService.getDoctorsBySpecialization(specialization);
+    }
+
     @Operation(summary = "Get doctor facilities")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Facilities found"),
