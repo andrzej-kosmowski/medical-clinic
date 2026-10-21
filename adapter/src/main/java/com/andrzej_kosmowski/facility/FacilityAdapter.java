@@ -61,7 +61,7 @@ public class FacilityAdapter implements FacilityRepository {
                .orElseThrow(() -> new FacilityNotFoundException(facility.getId()));
         List<DoctorEntity> doctors = doctorRepository.findAllByFacilitiesId(facility.getId());
         doctors.forEach(doctor -> doctor.getFacilities()
-                .removeIf(assigned -> assigned.getId().equals(doctor.getId())));
+                .removeIf(assigned -> assigned.getId().equals(entity.getId())));
         jpaRepository.delete(entity);
     }
 }
