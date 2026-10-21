@@ -22,10 +22,10 @@ public class User {
     }
 
     public void update(String firstName, String lastName, String email) {
-        this.validate();
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.validate();
     }
 
     public void validate() {
