@@ -8,6 +8,7 @@ import com.andrzej_kosmowski.pagination.PageResult;
 import com.andrzej_kosmowski.user.UserEntity;
 import com.andrzej_kosmowski.user.UserJpaRepository;
 import com.andrzej_kosmowski.user.UserNotFoundException;
+import com.andrzej_kosmowski.visit.VisitJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ public class DoctorAdapter implements DoctorRepository {
     private final DoctorJpaRepository doctorJpaRepository;
     private final FacilityJpaRepository facilityJpaRepository;
     private final UserJpaRepository userJpaRepository;
+    private final VisitJpaRepository visitJpaRepository;
     private final DoctorMapper mapper;
 
     @Transactional(readOnly = true)
@@ -85,5 +87,12 @@ public class DoctorAdapter implements DoctorRepository {
         }
         entity.setFacilities(new HashSet<>(foundFacilities));
         return mapper.toDomain(doctorJpaRepository.save(entity));
+    }
+
+    @Transactional
+    @Override
+    public void delete(Doctor doctor) {
+        visitJpaRepository.deleteAllByDoctorId(doctor.getId());
+        doctorJpaRepository.deleteById(doctor.getId());
     }
 }

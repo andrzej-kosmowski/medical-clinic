@@ -17,4 +17,5 @@ public interface DoctorUseCase {
     Doctor assignFacility(long doctorId, long facilityId);
     List<Facility> getFacilities(long doctorId);
     void removeFacility(long doctorId, long facilityId);
+    void delete(long id);
 }

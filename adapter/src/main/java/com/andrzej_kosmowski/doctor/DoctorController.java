@@ -107,19 +107,19 @@ public class DoctorController {
         return response;
     }
 
-//    @Operation(summary = "Delete doctor")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "204", description = "Doctor deleted successfully"),
-//            @ApiResponse(responseCode = "404", description = "Doctor not found",
-//                    content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
-//    })
-//    @DeleteMapping("/{id}")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    public void delete(@PathVariable Long id) {
-//        log.info("Deleting doctor with id: {}", id);
-//        doctorService.deleteDoctor(id);
-//        log.info("Doctor deleted successfully with id: {}", id);
-//    }
+    @Operation(summary = "Delete doctor")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Doctor deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Doctor not found",
+                    content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
+    })
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        log.info("Deleting doctor with id: {}", id);
+        doctorService.delete(id);
+        log.info("Doctor deleted successfully with id: {}", id);
+    }
 
     @Operation(summary = "Assign facility to doctor")
     @ApiResponses(value = {

@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface VisitJpaRepository extends JpaRepository<VisitEntity, Long>, JpaSpecificationExecutor<VisitEntity> {
     List<VisitEntity> findAllByDoctorId(Long doctorId);
+    void deleteAllByDoctorId(Long doctorId);
     List<VisitEntity> findAllByPatientId(Long patientId);
     List<VisitEntity> findAllByDoctorIdAndPatientIsNullAndStartTimeAfter(
             Long doctorId, LocalDateTime start);

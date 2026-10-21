@@ -21,8 +21,6 @@ public class PatientEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
-//    @OneToMany(mappedBy = "patient")
-//    private List<Visit> visits = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

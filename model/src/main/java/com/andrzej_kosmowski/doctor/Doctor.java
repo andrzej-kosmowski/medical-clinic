@@ -39,22 +39,11 @@ public class Doctor {
         }
         facilityIds.forEach(this::validateFacilityId);
     }
-//
-//    public void assignUser(User user) {
-//        this.user = user;
-//        user.assignDoctor(this);
-//    }
 
     public void assignFacility(Long facilityId) {
         validateFacilityId(facilityId);
         facilityIds.add(facilityId);
     }
-//
-//    public void addVisit(Visit visit) {
-//        if (!visits.contains(visit)) {
-//            visits.add(visit);
-//        }
-//    }
 
     public void removeFacility(Long facilityId) {
         validateFacilityId(facilityId);

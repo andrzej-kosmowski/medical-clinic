@@ -12,7 +12,6 @@ public class Patient {
     private String phoneNumber;
     private LocalDate birthday;
     private Long userId;
-//    private List<Visit> visits = new ArrayList<>();
 
     public Patient(Long id, String idCardNo, String phoneNumber, LocalDate birthday, Long userId) {
         this.id = id;
@@ -21,21 +20,6 @@ public class Patient {
         this.birthday = birthday;
         this.userId = userId;
     }
-//
-//    public void assignUser(User user) {
-//        this.user = user;
-//        user.assignPatient(this);
-//    }
-//
-//    public void addVisit(Visit visit) {
-//        if (!visits.contains(visit)) {
-//            visits.add(visit);
-//        }
-//    }
-
-//    public void removeVisit(Visit visit) {
-//        visits.remove(visit);
-//    }
 
     public void validate() {
         if (idCardNo == null || idCardNo.isBlank()) {

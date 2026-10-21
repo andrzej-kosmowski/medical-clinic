@@ -86,6 +86,12 @@ public class DoctorService implements DoctorUseCase {
         doctorRepository.save(doctor);
     }
 
+    @Override
+    public void delete(long id) {
+        Doctor doctor = findDoctorOrThrow(id);
+        doctorRepository.delete(doctor);
+    }
+
     private Doctor findDoctorOrThrow(Long id) {
         return doctorRepository.findById(id)
                 .orElseThrow(() -> new DoctorNotFoundException(id));

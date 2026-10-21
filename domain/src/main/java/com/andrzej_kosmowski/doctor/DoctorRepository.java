@@ -12,4 +12,5 @@ public interface DoctorRepository {
     List<Doctor> findBySpecialization(String specialization);
     List<Doctor> findByFacilityId(long facilitiesId);
     Doctor save(Doctor doctor);
+    void delete(Doctor doctor);
 }
