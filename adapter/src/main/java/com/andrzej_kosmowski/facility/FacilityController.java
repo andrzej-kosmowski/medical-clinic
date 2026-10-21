@@ -1,6 +1,9 @@
 package com.andrzej_kosmowski.facility;
 
 import com.andrzej_kosmowski.ErrorMessageDto;
+import com.andrzej_kosmowski.doctor.DoctorDto;
+import com.andrzej_kosmowski.doctor.DoctorMapper;
+import com.andrzej_kosmowski.doctor.DoctorService;
 import com.andrzej_kosmowski.pagination.PageQuery;
 import com.andrzej_kosmowski.pagination.PageResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping(value = "/facilities", produces = "application/json")
@@ -22,7 +27,9 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Facilities", description = "Facility management endpoints")
 public class FacilityController {
     private final FacilityService facilityService;
+    private final DoctorService doctorService;
     private final FacilityMapper mapper;
+    private final DoctorMapper doctorMapper;
 
     @Operation(summary = "Get all facilities")
     @ApiResponse(responseCode = "200", description = "List of facilities returned successfully")
@@ -43,16 +50,19 @@ public class FacilityController {
         return mapper.toDto(facilityService.getById(id));
     }
 
-//    @Operation(summary = "Get doctors assigned to facility")
-//    @ApiResponses(value = {
-//        @ApiResponse(responseCode = "200", description = "Doctors found"),
-//        @ApiResponse(responseCode = "404", description = "Facility not found",
-//            content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
-//    })
-//    @GetMapping("/{id}/doctors")
-//    public List<DoctorDto> getDoctors(@PathVariable Long id) {
-//        return facilityService.getDoctors(id);
-//    }
+    @Operation(summary = "Get doctors assigned to facility")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Doctors found"),
+        @ApiResponse(responseCode = "404", description = "Facility not found",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
+    })
+    @GetMapping("/{id}/doctors")
+    public List<DoctorDto> getDoctors(@PathVariable Long id) {
+        return doctorService.getByFacilityId(id)
+                .stream()
+                .map(doctorMapper::toDto)
+                .toList();
+    }
 
     @Operation(summary = "Create new facility")
     @ApiResponses(value = {
@@ -87,17 +97,17 @@ public class FacilityController {
         return facility;
     }
 
-//    @Operation(summary = "Delete facility")
-//    @ApiResponses(value = {
-//        @ApiResponse(responseCode = "204", description = "Facility deleted successfully"),
-//        @ApiResponse(responseCode = "404", description = "Facility not found",
-//            content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
-//    })
-//    @DeleteMapping("/{id}")
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    public void delete(@PathVariable Long id) {
-//        log.info("Deleting facility={}", id);
-//        facilityService.deleteFacility(id);
-//        log.info("Deleted facility={}", id);
-//    }
+    @Operation(summary = "Delete facility")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Facility deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Facility not found",
+            content = @Content(schema = @Schema(implementation = ErrorMessageDto.class)))
+    })
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        log.info("Deleting facility={}", id);
+        facilityService.delete(id);
+        log.info("Deleted facility={}", id);
+    }
 }

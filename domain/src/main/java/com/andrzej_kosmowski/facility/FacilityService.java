@@ -43,6 +43,12 @@ public class FacilityService implements FacilityUseCase {
         return facilityRepository.save(facility);
     }
 
+    @Override
+    public void delete(long id) {
+        Facility facility = findFacilityOrThrow(id);
+        facilityRepository.delete(facility);
+    }
+
     private Facility findFacilityOrThrow(Long id) {
         return facilityRepository.findById(id)
                 .orElseThrow(() -> new FacilityNotFoundException(id));

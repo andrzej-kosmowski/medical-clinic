@@ -8,4 +8,5 @@ public interface FacilityUseCase {
     PageResult<Facility> getAll(PageQuery query);
     Facility create(CreateFacilityCommand command);
     Facility update(long id, UpdateFacilityCommand command);
+    void delete(long id);
 }

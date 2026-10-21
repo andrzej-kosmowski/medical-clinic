@@ -25,20 +25,6 @@ public class FacilityEntity {
     private String street;
     @Column(nullable = false)
     private String buildingNumber;
-//    @ManyToMany(mappedBy = "facilities")
-//    private Set<Doctor> doctors = new HashSet<>();
-//
-//    public void assignDoctor(Doctor doctor) {
-//        if (doctors.add(doctor)) {
-//            doctor.getFacilities().add(this);
-//        }
-//    }
-//
-//    public void removeDoctor(Doctor doctor) {
-//        if (doctors.remove(doctor)) {
-//            doctor.getFacilities().remove(this);
-//        }
-//    }
 
     public FacilityEntity(String name, String city, String zipCode, String street, String buildingNumber) {
         this.name = name;

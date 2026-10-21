@@ -9,4 +9,5 @@ public interface FacilityRepository {
     PageResult<Facility> findAll(PageQuery query);
     boolean existsByName(String name);
     Facility save(Facility facility);
+    void delete(Facility facility);
 }
