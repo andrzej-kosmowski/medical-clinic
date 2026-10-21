@@ -1,6 +1,5 @@
 package com.andrzej_kosmowski.doctor;
 
-import com.andrzej_kosmowski.facility.Facility;
 import com.andrzej_kosmowski.facility.FacilityEntity;
 import com.andrzej_kosmowski.facility.FacilityJpaRepository;
 import com.andrzej_kosmowski.facility.FacilityNotFoundException;
