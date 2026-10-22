@@ -1,4 +1,4 @@
-package com.andrzej_kosmowski.medical_clinic;
+package com.andrzej_kosmowski;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
