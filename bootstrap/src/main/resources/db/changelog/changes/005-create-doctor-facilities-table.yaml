@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-create-doctor-facilities-table
+      author: Andrzej
+      changes:
+        - createTable:
+            tableName: doctor_facilities
+            columns:
+              - column:
+                  name: doctor_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_doctor_facilities
+                    foreignKeyName: fk_doctor_facilities_doctor
+                    references: doctors(id)
+              - column:
+                  name: facility_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_doctor_facilities
+                    foreignKeyName: fk_doctor_facilities_facility
+                    references: facilities(id)
